@@ -81,25 +81,36 @@ lib/
     │   │   ├── entities/
     │   │   ├── repositories/
     │   │   └── usecases/
-¿    │   └── presentation/
+    │   └── presentation/
     │       ├── cubit/
     │       ├── pages/
     │       └── widgets/
     │
-    └── orders/                 # MÓDULO DE PEDIDOS Y SINCRONIZACIÓN OFFLINE-FIRST
+    ├── orders/                 # MÓDULO DE PEDIDOS Y SINCRONIZACIÓN OFFLINE-FIRST
+    │   ├── data/
+    │   │   ├── datasource/
+    │   │   ├── models/
+    │   │   └── repositories/
+    │   ├── domain/
+    │   │   ├── entities/
+    │   │   ├── repositories/
+    │   │   └── usecases/
+    │   └── presentation/
+    │       ├── bloc/
+    │       ├── pages/
+    │       └── widgets/
+    │
+    └── settings/                 # MÓDULO DE CONFIGURACIÓN E INFORMACIÓN
         ├── data/
-        │   ├── datasource/
-        │   ├── models/
-        │   └── repositories/
+        │   ├── datasource/       # settings_remote_datasource.dart (Para leer info del restaurante de la API)
+        │   ├── models/           # restaurant_info_model.dart, user_preferences_model.dart
+        │   └── repositories/     # settings_repository_impl.dart
         ├── domain/
-        │   ├── entities/
-        │   ├── repositories/
-        │   └── usecases/
+        │   ├── entities/         # restaurant_info_entity.dart
+        │   ├── repositories/     # settings_repository.dart
+        │   └── usecases/         # get_restaurant_info_usecase.dart, update_restaurant_settings_usecase.dart
         └── presentation/
-            ├── bloc/
-            ├── pages/
-            └── widgets/
+            ├── bloc/             # settings_cubit.dart (Suele ser más práctico un Cubit aquí)
+            ├── pages/            # about_us_page.dart, admin_settings_page.dart, terms_page.dart
+            └── widgets/          # info_card_widget.dart, toggle_switch_setting.dart
 ```
-
----
-
