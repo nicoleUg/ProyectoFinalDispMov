@@ -40,8 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await loginUseCase.call(event.email, event.password);
       emit(AuthAuthenticated(user)); 
+    } catch (e) {
       emit(AuthError(e.toString())); 
-      emit(AuthUnauthenticated()); 
     }
   }
 
@@ -49,4 +49,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     await logoutUseCase.call();
     emit(AuthUnauthenticated()); 
+  }
 }

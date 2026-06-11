@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:drift_flutter/drift_flutter.dart';
 
 part 'app_database.g.dart'; 
+
 class CartItems extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get productId => text()();
@@ -12,6 +10,7 @@ class CartItems extends Table {
   IntColumn get quantity => integer()();
   RealColumn get price => real()();
 }
+
 class CategoriesTable extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -38,15 +37,8 @@ class ProductsTable extends Table {
 
 @DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable]) // <-- Agrega las tablas aquí
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(driftDatabase(name: 'restauranteX_db'));
 
   @override
   int get schemaVersion => 2; 
-}
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'restauranteX_db.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
 }
