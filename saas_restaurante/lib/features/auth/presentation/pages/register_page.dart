@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
+import '../widgets/custom_auth_input.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,14 +31,13 @@ class RegisterPage extends StatelessWidget {
       backgroundColor: const Color(0xFFF8F9FA),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900), // Max width para web/tablet
+          constraints: const BoxConstraints(maxWidth: 900),
           child: Card(
             elevation: 8,
             clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Si la pantalla es ancha (Web/Tablet), dividimos en 2 columnas
                 if (constraints.maxWidth > 600) {
                   return Row(
                     children: [
@@ -27,7 +46,6 @@ class RegisterPage extends StatelessWidget {
                     ],
                   );
                 }
-                // Si es celular, solo mostramos el formulario
                 return _buildFormPanel(primaryColor);
               },
             ),
@@ -74,13 +92,31 @@ class RegisterPage extends StatelessWidget {
           const Text('entra', style: TextStyle(color: Colors.grey)),
           const SizedBox(height: 32),
           
-          TextFormField(decoration: const InputDecoration(labelText: 'Full Name', border: UnderlineInputBorder())),
+          CustomAuthInput(
+            label: 'Full Name',
+            icon: Icons.badge_outlined,
+            controller: _nameController,
+          ),
           const SizedBox(height: 16),
-          TextFormField(decoration: const InputDecoration(labelText: 'Email Address', border: UnderlineInputBorder())),
+          
+          CustomAuthInput(
+            label: 'Email Address',
+            icon: Icons.email_outlined,
+            controller: _emailController,
+          ),
           const SizedBox(height: 16),
-          TextFormField(
-            obscureText: true,
-            decoration: const InputDecoration(labelText: 'Password', border: UnderlineInputBorder()),
+          
+          CustomAuthInput(
+            label: 'Password',
+            icon: Icons.lock_outline,
+            isPassword: true,
+            obscureText: _obscurePassword,
+            controller: _passwordController,
+            onToggleVisibility: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
           ),
           const SizedBox(height: 32),
           
@@ -89,7 +125,8 @@ class RegisterPage extends StatelessWidget {
             height: 48,
             child: FilledButton(
               style: FilledButton.styleFrom(backgroundColor: const Color(0xFFFF5722)),
-              onPressed: () {},
+              onPressed: () {
+              },
               child: const Text('Sign Up', style: TextStyle(fontSize: 16)),
             ),
           ),
