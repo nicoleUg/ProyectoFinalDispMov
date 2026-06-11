@@ -9,7 +9,7 @@ class LogoutDialog extends StatelessWidget {
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-
+      child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.white.withOpacity(0.9),
         elevation: 10,
@@ -20,8 +20,8 @@ class LogoutDialog extends StatelessWidget {
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: surfaceContainerHigh,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEDEEEF),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.logout, size: 48, color: primaryColor),
