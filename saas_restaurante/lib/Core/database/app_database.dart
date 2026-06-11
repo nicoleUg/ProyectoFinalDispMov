@@ -12,13 +12,36 @@ class CartItems extends Table {
   IntColumn get quantity => integer()();
   RealColumn get price => real()();
 }
+class CategoriesTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get imageUrl => text().nullable()();
+  IntColumn get orderIndex => integer()();
 
-@DriftDatabase(tables: [CartItems])
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+// Tabla para los Productos
+class ProductsTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get categoryId => text().references(CategoriesTable, #id)(); // Llave foránea
+  TextColumn get name => text()();
+  TextColumn get description => text()();
+  RealColumn get price => real()();
+  TextColumn get imageUrl => text().nullable()();
+  BoolColumn get isAvailable => boolean().withDefault(const Constant(true))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable]) // <-- Agrega las tablas aquí
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1; 
+  int get schemaVersion => 2; 
 }
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
