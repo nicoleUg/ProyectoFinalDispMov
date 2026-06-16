@@ -1,21 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/check_auth_usecase.dart';
-import '../../domain/usecases/logout_usecase.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final LoginUseCase loginUseCase;
-  final CheckAuthUseCase checkAuthUseCase;
-  final LogoutUseCase logoutUseCase;
+  final AuthRepository authRepository;
 
   AuthBloc({
-    required this.loginUseCase,
-    required this.checkAuthUseCase,
-    required this.logoutUseCase,
+    required this.authRepository,
   }) : super(AuthInitial()) {
-    
     on<CheckAuthRequested>(_onCheckAuthRequested);
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
@@ -24,9 +17,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onCheckAuthRequested(CheckAuthRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await checkAuthUseCase.call();
-      if (user != null) {
-        emit(AuthAuthenticated(user));
+      final isLoggedIn = await authRepository.isLoggedIn();
+      if (isLoggedIn) {
+        emit(const AuthAuthenticated());
       } else {
         emit(AuthUnauthenticated());
       }
@@ -38,15 +31,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading()); 
     try {
-      final user = await loginUseCase.call(event.email, event.password);
-      emit(AuthAuthenticated(user)); 
-      emit(AuthError(e.toString())); 
-      emit(AuthUnauthenticated()); 
+      await authRepository.login(event.email, event.password);
+      emit(const AuthAuthenticated()); 
+    } catch (e) {
+      emit(const AuthError('Usuario o contraseña incorrectos.')); 
     }
   }
 
   Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-    await logoutUseCase.call();
+    await authRepository.logout();
     emit(AuthUnauthenticated()); 
 }
