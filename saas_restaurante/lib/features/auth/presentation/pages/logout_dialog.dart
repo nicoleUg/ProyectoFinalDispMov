@@ -7,9 +7,11 @@ class LogoutDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = const Color(0xFFB02F00);
 
+    final surfaceContainerHigh = const Color(0xFFEDEEEF);
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-
+      child: Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         backgroundColor: Colors.white.withOpacity(0.9),
         elevation: 10,

@@ -11,6 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }) : super(AuthInitial()) {
     on<CheckAuthRequested>(_onCheckAuthRequested);
     on<LoginRequested>(_onLoginRequested);
+    on<RegisterRequested>(_onRegisterRequested);
     on<LogoutRequested>(_onLogoutRequested);
   }
 
@@ -42,4 +43,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     await authRepository.logout();
     emit(AuthUnauthenticated()); 
+  }
+
+  Future<void> _onRegisterRequested(
+    RegisterRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      // 1. Creamos el usuario en NestJS
+      await authRepository.register(event.email, event.password, event.name);
+      
+      // 2. Si el registro fue exitoso, hacemos el login automático para obtener el token
+      await authRepository.login(event.email, event.password);
+      
+      // 3. ¡Navegamos al menú!
+      emit(const AuthAuthenticated());
+    } catch (e) {
+      emit(const AuthError('Error al registrar: Es posible que el correo ya esté en uso.'));
+    }
+  }
 }
