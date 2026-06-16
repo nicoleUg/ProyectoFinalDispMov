@@ -171,6 +171,17 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("Don't have an account?", style: TextStyle(color: Colors.grey)),
+                                TextButton(
+                                  onPressed: () => context.go('/register'),
+                                  child: Text('Sign Up', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
