@@ -15,6 +15,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<AuthBloc>(
           create: (context) => di.sl<AuthBloc>()..add(CheckAuthRequested()),
         ),
+        BlocProvider<CartCubit>(
+          create: (context) => di.sl<CartCubit>()..loadCart(),
+        ),
       ],
       child: MaterialApp.router(
         title: 'Restaurante X',
