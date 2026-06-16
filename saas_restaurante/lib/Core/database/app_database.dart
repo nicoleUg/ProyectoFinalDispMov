@@ -22,10 +22,9 @@ class CategoriesTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-// Tabla para los Productos
 class ProductsTable extends Table {
   TextColumn get id => text()();
-  TextColumn get categoryId => text().references(CategoriesTable, #id)(); // Llave foránea
+  TextColumn get categoryId => text().references(CategoriesTable, #id)(); 
   TextColumn get name => text()();
   TextColumn get description => text()();
   RealColumn get price => real()();
@@ -36,7 +35,7 @@ class ProductsTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable]) // <-- Agrega las tablas aquí
+@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable]) 
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

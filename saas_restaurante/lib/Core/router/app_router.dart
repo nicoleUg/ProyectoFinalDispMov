@@ -14,6 +14,10 @@ class AppRouter {
         path: '/register',
         builder: (context, state) => const RegisterPage(),
       ),
+      GoRoute(
+        path: '/',
+        builder: (context, state) => const MenuPage(),
+      ),
     ],
   );
 }
