@@ -1,51 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/orders_bloc.dart';
+import '../bloc/orders_event.dart';
+import '../bloc/orders_state.dart';
 
-class OrderTrackingPage extends StatelessWidget {
+class OrderTrackingPage extends StatefulWidget {
   const OrderTrackingPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final primary = const Color(0xFFB02F00);
-    final background = const Color(0xFFF8F9FA);
+  State<OrderTrackingPage> createState() => _OrderTrackingPageState();
+}
 
+class _OrderTrackingPageState extends State<OrderTrackingPage> {
+  final primary = const Color(0xFFB02F00);
+  final background = const Color(0xFFF8F9FA);
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<OrdersBloc>().add(LoadMyOrdersRequested());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        leading: const Icon(Icons.menu, color: Colors.black87),
         title: Text('BurgerDash', style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
-        actions: const [
-          Icon(Icons.shopping_basket, color: Colors.black87),
-          SizedBox(width: 16),
-        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 450),
-            child: Column(
-              children: [
-                // --- Status Hero Card ---
-                _buildStatusHero(primary),
-                const SizedBox(height: 24),
-                
-                // --- MD3 Timeline Card ---
-                _buildTimelineCard(primary),
-                const SizedBox(height: 24),
+      body: BlocBuilder<OrdersBloc, OrdersState>(
+        builder: (context, state) {
+          if (state is OrdersLoading) {
+            return Center(child: CircularProgressIndicator(color: primary));
+          }
+          
+          if (state is OrdersError) {
+            return Center(child: Text('Error: ${state.message}'));
+          }
 
-                // --- Order Summary Card ---
-                _buildOrderSummary(primary),
-              ],
-            ),
-          ),
-        ),
+          if (state is MyOrdersLoaded) {
+            if (state.orders.isEmpty) {
+              return const Center(child: Text('No tienes órdenes activas.', style: TextStyle(fontSize: 16)));
+            }
+
+            final currentOrder = state.orders.first;
+            final isPreparing = currentOrder.status == 'preparing';
+            final isReady = currentOrder.status == 'ready';
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 450),
+                  child: Column(
+                    children: [
+                      _buildStatusHero(currentOrder.status),
+                      const SizedBox(height: 24),
+                      
+                      _buildTimelineCard(isPreparing, isReady),
+                      const SizedBox(height: 24),
+
+                      _buildOrderSummary(currentOrder),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
     );
   }
 
-  Widget _buildStatusHero(Color primary) {
+  Widget _buildStatusHero(String status) {
+    String title = status == 'ready' ? 'Order Ready!' : 'Preparing Order';
     return Container(
       height: 160,
       decoration: BoxDecoration(
@@ -67,14 +98,14 @@ class OrderTrackingPage extends StatelessWidget {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 16,
             left: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Preparing Order', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                Text('Estimated arrival: 7:45 PM', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                const Text('Estimated arrival: 7:45 PM', style: TextStyle(color: Colors.white70, fontSize: 14)),
               ],
             ),
           )
@@ -83,7 +114,9 @@ class OrderTrackingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineCard(Color primary) {
+  Widget _buildTimelineCard(bool isPreparing, bool isReady) {
+    double progress = isReady ? 1.0 : (isPreparing ? 0.5 : 0.0);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -95,21 +128,18 @@ class OrderTrackingPage extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Línea de fondo
             Container(height: 4, color: Colors.grey.shade200),
-            // Línea activa (Progreso al 50% como el HTML)
             FractionallySizedBox(
               alignment: Alignment.centerLeft,
-              widthFactor: 0.5,
+              widthFactor: progress,
               child: Container(height: 4, color: primary),
             ),
-            // Nodos
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildNode(Icons.check, 'Received', true, primary),
-                _buildNode(Icons.skillet, 'Preparing', true, primary, isActive: true),
-                _buildNode(Icons.directions_bike, 'Ready', false, primary),
+                _buildNode(Icons.check, 'Received', true, isActive: !isPreparing && !isReady),
+                _buildNode(Icons.skillet, 'Preparing', isPreparing || isReady, isActive: isPreparing),
+                _buildNode(Icons.directions_bike, 'Ready', isReady, isActive: isReady),
               ],
             ),
           ],
@@ -118,18 +148,18 @@ class OrderTrackingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNode(IconData icon, String label, bool isCompleted, Color primary, {bool isActive = false}) {
+  Widget _buildNode(IconData icon, String label, bool isCompleted, {bool isActive = false}) {
     return Column(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isCompleted ? primary : Colors.grey.shade300,
+            color: isCompleted || isActive ? primary : Colors.grey.shade300,
             shape: BoxShape.circle,
-            border: isActive ? Border.all(color: primary, width: 2) : null,
+            border: isActive ? Border.all(color: const Color(0xFFFF5722), width: 3) : null,
           ),
-          child: Icon(icon, color: isCompleted ? Colors.white : Colors.grey, size: 20),
+          child: Icon(icon, color: isCompleted || isActive ? Colors.white : Colors.grey, size: 20),
         ),
         const SizedBox(height: 8),
         Text(label, style: TextStyle(fontSize: 11, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
@@ -137,7 +167,9 @@ class OrderTrackingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderSummary(Color primary) {
+  Widget _buildOrderSummary(order) {
+    final shortId = order.id.toString().substring(0, 4).toUpperCase();
+    
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -147,53 +179,52 @@ class OrderTrackingPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('ORDER NUMBER', style: TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1.2)),
-                    Text('#1234', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const Text('ORDER NUMBER', style: TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1.2)),
+                    Text('#$shortId', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
                 ),
-                TextButton(onPressed: () {}, child: Text('Receipt', style: TextStyle(color: primary))),
+                if (!order.isSynced)
+                  const Row(
+                    children: [
+                      Icon(Icons.cloud_off, color: Colors.orange, size: 16),
+                      SizedBox(width: 4),
+                      Text('Pending Sync', style: TextStyle(color: Colors.orange, fontSize: 12)),
+                    ],
+                  ),
               ],
             ),
             const Divider(height: 32),
-            _buildItemRow('1x', 'Smokehouse Burger'),
-            _buildItemRow('1x', 'Crispy Fries'),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE4E2E1), foregroundColor: Colors.black87),
-                onPressed: () {},
-                icon: const Icon(Icons.call),
-                label: const Text('Call Restaurant'),
+            
+            ...order.items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
+                    child: Text('${item.quantity}x', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(item.productName, style: const TextStyle(fontSize: 16)),
+                ],
               ),
+            )).toList(),
+            
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text('Total: \$${order.total.toStringAsFixed(2)}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primary)),
             )
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildItemRow(String qty, String name) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
-            child: Text(qty, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(width: 12),
-          Text(name, style: const TextStyle(fontSize: 16)),
-        ],
       ),
     );
   }

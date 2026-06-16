@@ -1,12 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../layout/main_layout.dart';
 import '../../../features/auth/presentation/pages/login_page.dart';
 import '../../../features/auth/presentation/pages/register_page.dart';
+import '../../../features/menu/presentation/pages/menu_page.dart';
 import '../../../features/cart/presentation/pages/cart_page.dart';
-import '../../../features/menu/presentation/pages/menu_page.dart';  
+import '../../../features/orders/presentation/pages/order_tracking_page.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/login', 
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: '/login',
     routes: [
       GoRoute(
         path: '/login',
@@ -17,13 +24,26 @@ class AppRouter {
         builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
-        path: '/',
-        builder: (context, state) => const MenuPage(),
-      ),
-      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: '/cart',
         builder: (context, state) => const CartPage(),
-      ),  
+      ),
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) {
+          return MainLayout(child: child);
+        },
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const MenuPage(),
+          ),
+          GoRoute(
+            path: '/orders',
+            builder: (context, state) => const OrderTrackingPage(),
+          ),
+        ],
+      ),
     ],
   );
 }
