@@ -8,7 +8,6 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Colores base extraídos de tu configuración Tailwind
     final background = const Color(0xFFF8F9FA);
     final surfaceContainerLowest = const Color(0xFFFFFFFF);
     final surfaceContainerLow = const Color(0xFFF3F4F5);
@@ -49,7 +48,7 @@ class CartPage extends StatelessWidget {
           return SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800), // Max width para desktop
+                constraints: const BoxConstraints(maxWidth: 800), 
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   children: [
@@ -159,7 +158,12 @@ class CartPage extends StatelessWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                         ),
                         onPressed: () {
-
+                            context.read<OrdersBloc>().add(
+                              ConfirmOrderRequested(
+                                cartItems: state.items,
+                                total: state.total + 2.0,
+                              ),
+                            );
                         },
                         label: const Text('Confirm Order', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         icon: const Icon(Icons.check_circle),

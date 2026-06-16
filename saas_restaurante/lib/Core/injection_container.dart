@@ -19,6 +19,11 @@ import '../../features/menu/domain/usecases/get_local_categories_usecase.dart';
 import '../../features/menu/domain/usecases/get_local_products_usecase.dart';
 import '../../features/menu/domain/usecases/sync_menu_usecase.dart';
 import '../../features/menu/presentation/bloc/menu_bloc.dart';
+import '../../features/orders/domain/repositories/order_repository.dart';
+import '../../features/orders/data/datasource/orders_local_datasource.dart';
+import '../../features/orders/data/datasource/orders_remote_datasource.dart';
+import '../../features/orders/data/repositories/orders_repository_impl.dart';
+import '../../features/orders/presentation/bloc/orders_bloc.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -76,4 +81,12 @@ Future<void> init() async {
 
   sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
   sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));
+  sl.registerFactory(() => OrdersBloc(sl()));
+  
+  sl.registerLazySingleton<OrderRepository>(
+    () => OrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl())
+  );
+  
+  sl.registerLazySingleton<OrdersLocalDataSource>(() => OrdersLocalDataSourceImpl(sl()));
+  sl.registerLazySingleton<OrdersRemoteDataSource>(() => OrdersRemoteDataSourceImpl(sl()));
 }

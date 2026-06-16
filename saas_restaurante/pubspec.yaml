@@ -45,6 +45,7 @@ dependencies:
   go_router: ^17.3.0
   equatable: ^2.0.8
   drift_flutter: ^0.3.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
