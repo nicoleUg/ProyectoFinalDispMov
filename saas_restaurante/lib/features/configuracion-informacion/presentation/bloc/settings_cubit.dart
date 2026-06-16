@@ -1,0 +1,1 @@
+// Cubit configuration for settings
