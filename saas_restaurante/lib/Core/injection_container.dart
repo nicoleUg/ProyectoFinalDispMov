@@ -3,15 +3,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'database/app_database.dart';
 import 'secure_storage/secure_storage_service.dart';
 import 'network/api_client.dart';
-import '../features/auth/domain/repositories/auth_repository.dart';
-import '../features/auth/domain/usecases/login_usecase.dart';
-import '../features/auth/domain/usecases/logout_usecase.dart';
-import '../features/auth/domain/usecases/check_auth_usecase.dart';
-import '../features/auth/data/datasource/auth_local_datasource.dart';
-import '../features/auth/data/datasource/auth_remote_datasource.dart';
-import '../features/auth/data/repositories/auth_repository_impl.dart';
-import '../features/auth/presentation/bloc/auth_bloc.dart';
-
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
@@ -73,4 +64,16 @@ Future<void> init() async {
 
   sl.registerLazySingleton<MenuRemoteDataSource>(() => MenuRemoteDataSourceImpl(sl()));
   sl.registerLazySingleton<MenuLocalDataSource>(() => MenuLocalDataSourceImpl(sl()));
+  sl.registerFactory(() => CartCubit(
+    addToCartUseCase: sl(),
+    getCartItemsUseCase: sl(),
+    updateQuantityUseCase: sl(),
+  ));
+
+  sl.registerLazySingleton(() => AddToCartUseCase(sl()));
+  sl.registerLazySingleton(() => GetCartItemsUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateQuantityUseCase(sl())); 
+
+  sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
+  sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));
 }

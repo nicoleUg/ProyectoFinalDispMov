@@ -108,6 +108,12 @@ class _MenuPageState extends State<MenuPage> {
                             return ProductCard(
                               product: product,
                               onAddPressed: () {
+                                context.read<CartCubit>().addItem(CartItemEntity(
+                                    productId: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    quantity: 1,
+                                )); 
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('${product.name} añadido al carrito'),
