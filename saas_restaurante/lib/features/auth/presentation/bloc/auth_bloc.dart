@@ -44,7 +44,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await authRepository.logout();
     emit(AuthUnauthenticated()); 
   }
-
   Future<void> _onRegisterRequested(
     RegisterRequested event,
     Emitter<AuthState> emit,
@@ -62,5 +61,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(const AuthError('Error al registrar: Es posible que el correo ya esté en uso.'));
     }
-  }
 }

@@ -9,3 +9,4 @@ class UserEntity {
     required this.fullName,
     required this.role,
   });
+}
