@@ -392,12 +392,23 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Mesa #${order.id.substring(order.id.length - 3).toUpperCase()}',
-                style: RSTypography.titleSmall.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+              Row(
+                children: [
+                  Text(
+                    'Mesa #${order.id.substring(order.id.length - 3).toUpperCase()}',
+                    style: RSTypography.titleSmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  if (order.status == 'ready') ...[
+                    const SizedBox(width: 8),
+                    const PulseIndicator(color: Color(0xFF1B5E20)),
+                  ] else if (minutesAgo > 20) ...[
+                    const SizedBox(width: 8),
+                    const PulseIndicator(color: RSColors.error),
+                  ],
+                ],
               ),
               Row(
                 children: [
@@ -473,6 +484,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
                 orderId: order.id,
                 newStatus: 'preparing',
               ));
+          _showStatusUpdateFeedback(order.id, 'preparing');
         },
       );
     } else if (order.status == 'preparing') {
@@ -485,6 +497,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
                 orderId: order.id,
                 newStatus: 'ready',
               ));
+          _showStatusUpdateFeedback(order.id, 'ready');
         },
       );
     } else {
@@ -497,6 +510,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
                 orderId: order.id,
                 newStatus: 'delivered', // Move out of board
               ));
+          _showStatusUpdateFeedback(order.id, 'delivered');
         },
       );
     }
@@ -507,6 +521,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
           orderId: orderId,
           newStatus: targetStatus,
         ));
+    _showStatusUpdateFeedback(orderId, targetStatus);
   }
 
   Widget _buildMobileBottomNav() {
@@ -550,6 +565,86 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
             label: 'Orders',
           ),
         ],
+      ),
+    );
+  }
+
+  void _showStatusUpdateFeedback(String orderId, String status) {
+    final statusLabel = status == 'pending' 
+        ? 'Pendientes' 
+        : status == 'preparing' 
+            ? 'En Preparación' 
+            : status == 'ready' 
+                ? 'Listos' 
+                : 'Entregados';
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.white),
+            const SizedBox(width: 8),
+            Text('Pedido #${orderId.substring(orderId.length - 3).toUpperCase()} movido a $statusLabel'),
+          ],
+        ),
+        backgroundColor: status == 'ready' 
+            ? const Color(0xFF1B5E20) 
+            : status == 'preparing' 
+                ? const Color(0xFF0D47A1) 
+                : Colors.black87,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
+class PulseIndicator extends StatefulWidget {
+  final Color color;
+  const PulseIndicator({super.key, required this.color});
+
+  @override
+  State<PulseIndicator> createState() => _PulseIndicatorState();
+}
+
+class _PulseIndicatorState extends State<PulseIndicator> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.4, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: widget.color,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: widget.color.withOpacity(0.5),
+              blurRadius: 4,
+              spreadRadius: 2,
+            )
+          ]
+        ),
       ),
     );
   }

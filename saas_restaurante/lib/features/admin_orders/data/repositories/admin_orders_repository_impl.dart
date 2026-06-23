@@ -1,12 +1,14 @@
 import 'package:drift/drift.dart';
 import '../../../../Core/database/app_database.dart';
+import '../../../../Core/network/api_client.dart';
 import '../../../orders/domain/entities/order_entity.dart';
 import '../../domain/repositories/admin_orders_repository.dart';
 
 class AdminOrdersRepositoryImpl implements AdminOrdersRepository {
   final AppDatabase db;
+  final ApiClient apiClient;
 
-  AdminOrdersRepositoryImpl({required this.db});
+  AdminOrdersRepositoryImpl({required this.db, required this.apiClient});
 
   @override
   Future<List<OrderEntity>> getAdminOrders() async {
@@ -50,10 +52,21 @@ class AdminOrdersRepositoryImpl implements AdminOrdersRepository {
 
   @override
   Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    // 1. Update SQLite local state
     await (db.update(db.ordersTable)..where((t) => t.id.equals(orderId)))
         .write(OrdersTableCompanion(
       status: Value(newStatus),
     ));
+
+    // 2. Try to sync to remote API
+    try {
+      await apiClient.dio.patch('/orders/$orderId/status', data: {
+        'status': newStatus,
+      });
+      print('Sincronización de pedido $orderId exitosa en el servidor.');
+    } catch (e) {
+      print('Advertencia: No se pudo sincronizar el estado en el servidor: $e. Operando localmente.');
+    }
   }
 
   Future<void> _seedMockOrders() async {

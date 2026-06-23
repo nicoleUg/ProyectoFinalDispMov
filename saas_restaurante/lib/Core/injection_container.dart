@@ -72,7 +72,7 @@ Future<void> init() async {
       ));
 
   // Admin Orders
-  sl.registerLazySingleton<AdminOrdersRepository>(() => AdminOrdersRepositoryImpl(db: sl()));
+  sl.registerLazySingleton<AdminOrdersRepository>(() => AdminOrdersRepositoryImpl(db: sl(), apiClient: sl()));
   sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
   sl.registerLazySingleton(() => UpdateOrderStatusUseCase(sl()));
 
