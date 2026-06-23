@@ -1,0 +1,559 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
+import '../bloc/admin_menu_bloc.dart';
+import '../bloc/admin_menu_event.dart';
+import '../bloc/admin_menu_state.dart';
+import '../../../menu/domain/entities/category_entity.dart';
+import '../../../menu/domain/entities/product_entity.dart';
+
+class GestiNDeMenAppAdmin extends StatefulWidget {
+  const GestiNDeMenAppAdmin({super.key});
+
+  @override
+  State<GestiNDeMenAppAdmin> createState() => _GestiNDeMenAppAdminState();
+}
+
+class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
+  String? _selectedCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 768;
+
+    return Scaffold(
+      backgroundColor: RSColors.background,
+      body: Row(
+        children: [
+          if (isDesktop) _buildDesktopDrawer(),
+          Expanded(
+            child: Column(
+              children: [
+                _buildHeader(isDesktop),
+                Expanded(
+                  child: BlocConsumer<AdminMenuBloc, AdminMenuState>(
+                    listener: (context, state) {
+                      if (state is AdminMenuActionSuccess) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+                      }
+                      if (state is AdminMenuError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.error),
+                            backgroundColor: RSColors.error,
+                          ),
+                        );
+                      }
+                      if (state is AdminMenuLoaded) {
+                        if (_selectedCategoryId == null && state.categories.isNotEmpty) {
+                          setState(() {
+                            _selectedCategoryId = state.selectedCategoryId ?? state.categories.first.id;
+                          });
+                        }
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is AdminMenuLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(color: RSColors.primary),
+                        );
+                      }
+
+                      if (state is AdminMenuLoaded) {
+                        return _buildMenuContent(state);
+                      }
+
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'No se pudieron cargar los datos del menú',
+                              style: RSTypography.bodyLarge,
+                            ),
+                            RSSpacing.verticalMd,
+                            RSButton.filled(
+                              label: 'Reintentar',
+                              onPressed: () {
+                                context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.push('/admin-menu/new-product');
+        },
+        backgroundColor: RSColors.primaryContainer,
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
+      bottomNavigationBar: isDesktop ? null : _buildMobileBottomNav(),
+    );
+  }
+
+  Widget _buildDesktopDrawer() {
+    return Container(
+      width: 280,
+      decoration: BoxDecoration(
+        color: RSColors.surfaceContainerLow,
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(2, 0),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Restaurante SaaS',
+                  style: RSTypography.titleLarge.copyWith(
+                    color: RSColors.primary,
+                  ),
+                ),
+                RSSpacing.verticalMd,
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: RSColors.outlineVariant.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.store, color: RSColors.textOnSurfaceVariant),
+                    ),
+                    RSSpacing.horizontalSm,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Store #104 - Admin',
+                          style: RSTypography.titleSmall.copyWith(
+                            color: RSColors.textOnSurfaceVariant,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: RSColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            RSSpacing.horizontalSm,
+                            Text(
+                              'Active',
+                              style: RSTypography.labelSmall.copyWith(
+                                color: RSColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildDrawerItem(Icons.dashboard_outlined, 'Dashboard', false, () => context.go('/')),
+          _buildDrawerItem(Icons.restaurant_menu, 'Menu Editor', true, () {}),
+          _buildDrawerItem(Icons.receipt_long_outlined, 'Orders', false, () => context.go('/orders')),
+          _buildDrawerItem(Icons.settings_outlined, 'Settings', false, () {}),
+          const Spacer(),
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              'v1.0.0-SaaS',
+              style: RSTypography.labelSmall.copyWith(
+                color: RSColors.textOnSurfaceVariant.withOpacity(0.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(IconData icon, String title, bool isActive, VoidCallback onTap) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive ? RSColors.primary.withOpacity(0.1) : Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: isActive ? RSColors.primary : RSColors.textOnSurfaceVariant,
+        ),
+        title: Text(
+          title,
+          style: RSTypography.titleSmall.copyWith(
+            color: isActive ? RSColors.primary : RSColors.textOnSurfaceVariant,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+        onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      ),
+    );
+  }
+
+  Widget _buildHeader(bool isDesktop) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      color: Colors.white,
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          children: [
+            if (!isDesktop)
+              IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {},
+              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Active Menu',
+                  style: RSTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Manage item availability and pricing.',
+                  style: RSTypography.bodyMedium.copyWith(
+                    color: RSColors.textOnSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuContent(AdminMenuLoaded state) {
+    final selectedCategoryProducts = state.products.where((p) {
+      if (_selectedCategoryId == null) return true;
+      return p.categoryId == _selectedCategoryId;
+    }).toList();
+
+    return Column(
+      children: [
+        _buildCategoryTabs(state.categories),
+        Expanded(
+          child: selectedCategoryProducts.isEmpty
+              ? _buildEmptyProductsView()
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  itemCount: selectedCategoryProducts.length,
+                  itemBuilder: (context, index) {
+                    final product = selectedCategoryProducts[index];
+                    return _buildProductCard(product);
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategoryTabs(List<CategoryEntity> categories) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          final isSelected = cat.id == _selectedCategoryId;
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: RSChoiceChip(
+              label: cat.name,
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) {
+                  setState(() {
+                    _selectedCategoryId = cat.id;
+                  });
+                }
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildProductCard(ProductEntity product) {
+    final isAvailable = product.isAvailable;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: RSCard(
+        backgroundColor: isAvailable ? RSColors.surfaceContainerLowest : RSColors.background.withOpacity(0.5),
+        borderColor: isAvailable ? RSColors.outlineVariant : RSColors.outlineVariant.withOpacity(0.1),
+        padding: const EdgeInsets.all(RSSpacing.md),
+        child: Row(
+          children: [
+            // Product Image
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: RSColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(12),
+                image: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                    ? DecorationImage(
+                        image: NetworkImage(product.imageUrl!),
+                        fit: BoxFit.cover,
+                        colorFilter: !isAvailable
+                            ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
+                            : null,
+                      )
+                    : null,
+              ),
+              child: product.imageUrl == null || product.imageUrl!.isEmpty
+                  ? const Icon(
+                      Icons.fastfood_outlined,
+                      color: RSColors.primary,
+                      size: 32,
+                    )
+                  : null,
+            ),
+            RSSpacing.horizontalMd,
+            // Product Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.between,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.name,
+                          style: RSTypography.titleMedium.copyWith(
+                            color: isAvailable ? Colors.black87 : Colors.grey,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        '\$${product.price.toStringAsFixed(2)}',
+                        style: RSTypography.titleMedium.copyWith(
+                          color: isAvailable ? RSColors.primary : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  RSSpacing.verticalXs,
+                  Text(
+                    product.description,
+                    style: RSTypography.bodyMedium.copyWith(
+                      color: isAvailable ? RSColors.textOnSurfaceVariant : Colors.grey.shade400,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  RSSpacing.verticalMd,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.between,
+                    children: [
+                      // Availability switch
+                      Row(
+                        children: [
+                          Switch(
+                            value: isAvailable,
+                            onChanged: (value) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${product.name} ${value ? "disponible" : "fuera de stock"}',
+                                  ),
+                                  duration: const Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                            activeColor: RSColors.primary,
+                          ),
+                          RSSpacing.horizontalSm,
+                          Text(
+                            isAvailable ? 'Available' : 'Out of Stock',
+                            style: RSTypography.labelLarge.copyWith(
+                              color: isAvailable ? Colors.black87 : RSColors.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Actions: Edit and Delete
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit_outlined),
+                            onPressed: () {
+                              context.push('/admin-menu/edit-product', extra: product);
+                            },
+                            color: RSColors.textOnSurfaceVariant,
+                            iconSize: 20,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.all(8),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () => _confirmDelete(product),
+                            color: RSColors.error,
+                            iconSize: 20,
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.all(8),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyProductsView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.restaurant_menu, size: 64, color: Colors.grey),
+          RSSpacing.verticalMd,
+          Text(
+            'No hay productos en esta categoría',
+            style: RSTypography.bodyLarge.copyWith(color: RSColors.textOnSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDelete(ProductEntity product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Eliminar Producto'),
+          content: Text('¿Estás seguro de que deseas eliminar "${product.name}" de la carta?'),
+          actions: [
+            RSButton.tonal(
+              label: 'Cancelar',
+              onPressed: () => Navigator.of(context).pop(),
+              size: RSButtonSize.small,
+            ),
+            RSButton.filled(
+              label: 'Eliminar',
+              onPressed: () {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Producto "${product.name}" eliminado con éxito'),
+                    backgroundColor: RSColors.error,
+                  ),
+                );
+              },
+              size: RSButtonSize.small,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: RSColors.surfaceContainerLow,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: BottomNavigationBar(
+        currentIndex: 1,
+        onTap: (index) {
+          if (index == 0) context.go('/');
+          if (index == 2) context.go('/orders');
+        },
+        selectedItemColor: RSColors.primary,
+        unselectedItemColor: RSColors.textOnSurfaceVariant,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu_outlined),
+            activeIcon: Icon(Icons.restaurant_menu),
+            label: 'Menu',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
+            label: 'Orders',
+          ),
+        ],
+      ),
+    );
+  }
+}

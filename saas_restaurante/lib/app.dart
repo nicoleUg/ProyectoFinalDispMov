@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp.router(
-        title: 'Restaurante X',
+        title: 'Restaurante SaaS',
         debugShowCheckedModeBanner: false,
         routerConfig: AppRouter.router,
         theme: ThemeData(

@@ -376,6 +376,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "17.3.0"
+  google_fonts:
+    dependency: transitive
+    description:
+      name: google_fonts
+      sha256: ba03d03bcaa2f6cb7bd920e3b5027181db75ab524f8891c8bc3aa603885b8055
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.3.3"
   graphs:
     dependency: transitive
     description:
@@ -392,6 +400,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  http:
+    dependency: transitive
+    description:
+      name: http
+      sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -664,6 +680,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.0"
+  restaurantesaas_design_system:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: "4fbdf42485d39d20acf9c84b4101047502c61b5e"
+      url: "https://github.com/nicoleUg/designSystem-RestauranteSaas.git"
+    source: git
+    version: "1.0.0"
   shelf:
     dependency: transitive
     description:

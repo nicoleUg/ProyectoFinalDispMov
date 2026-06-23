@@ -46,7 +46,11 @@ class _RegisterPageState extends State<RegisterPage> {
             );
           }
           if (state is AuthAuthenticated) {
-            context.go('/');
+            if (state.user?.role == 'admin') {
+              context.go('/admin-menu');
+            } else {
+              context.go('/');
+            }
           }
         },
         builder: (context, state) {

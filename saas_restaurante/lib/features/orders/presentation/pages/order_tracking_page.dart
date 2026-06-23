@@ -28,7 +28,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        title: Text('BurgerDash', style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
+        title: Text('Restaurante SaaS', style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
       ),
       body: BlocBuilder<OrdersBloc, OrdersState>(
         builder: (context, state) {

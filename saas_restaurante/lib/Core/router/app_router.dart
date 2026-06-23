@@ -6,6 +6,7 @@ import '../../../features/auth/presentation/pages/register_page.dart';
 import '../../../features/menu/presentation/pages/menu_page.dart';
 import '../../../features/cart/presentation/pages/cart_page.dart';
 import '../../../features/orders/presentation/pages/order_tracking_page.dart';
+import '../../../features/admin_menu/presentation/pages/gesti_n_de_men_app_admin.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -27,6 +28,10 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: '/cart',
         builder: (context, state) => const CartPage(),
+      ),
+      GoRoute(
+        path: '/admin-menu',
+        builder: (context, state) => const GestiNDeMenAppAdmin(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

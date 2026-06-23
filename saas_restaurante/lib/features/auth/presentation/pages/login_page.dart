@@ -46,7 +46,11 @@ class _LoginPageState extends State<LoginPage> {
             );
           }
           if (state is AuthAuthenticated) {
-            context.go('/');
+            if (state.user?.role == 'admin') {
+              context.go('/admin-menu');
+            } else {
+              context.go('/');
+            }
           }
         },
         builder: (context, state) {
@@ -69,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Restaurante X',
+                      'Restaurante SaaS',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

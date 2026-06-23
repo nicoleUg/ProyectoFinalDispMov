@@ -28,7 +28,7 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('GourmetFlow', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Restaurante SaaS', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: primaryColor,
         elevation: 0,
