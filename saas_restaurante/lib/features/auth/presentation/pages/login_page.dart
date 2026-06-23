@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
           }
           if (state is AuthAuthenticated) {
             if (state.user?.role == 'admin') {
-              context.go('/admin-menu');
+              context.go('/admin-dashboard');
             } else {
               context.go('/');
             }

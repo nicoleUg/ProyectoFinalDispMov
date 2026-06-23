@@ -11,6 +11,8 @@ import '../../../features/admin_menu/presentation/pages/nuevo_producto_app_admin
 import '../../../features/admin_menu/presentation/pages/editar_producto_app_admin.dart';
 import '../../../features/menu/domain/entities/product_entity.dart';
 import '../../../features/admin_orders/presentation/pages/pedidos_app_admin.dart';
+import '../../../features/admin_reports/presentation/pages/dashboard_app_admin.dart';
+import '../../../features/admin_reports/presentation/pages/reporte_de_ventas_app_admin.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -32,6 +34,14 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: '/cart',
         builder: (context, state) => const CartPage(),
+      ),
+      GoRoute(
+        path: '/admin-dashboard',
+        builder: (context, state) => const DashboardAppAdmin(),
+      ),
+      GoRoute(
+        path: '/admin-reports',
+        builder: (context, state) => const ReporteDeVentasAppAdmin(),
       ),
       GoRoute(
         path: '/admin-menu',

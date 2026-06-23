@@ -169,9 +169,10 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildDrawerItem(Icons.dashboard_outlined, 'Dashboard', false, () => context.go('/')),
+          _buildDrawerItem(Icons.dashboard_outlined, 'Dashboard', false, () => context.go('/admin-dashboard')),
           _buildDrawerItem(Icons.restaurant_menu, 'Menu Editor', false, () => context.go('/admin-menu')),
           _buildDrawerItem(Icons.receipt_long, 'Kitchen Board', true, () {}),
+          _buildDrawerItem(Icons.bar_chart, 'Reports', false, () => context.go('/admin-reports')),
           _buildDrawerItem(Icons.settings_outlined, 'Settings', false, () {}),
           const Spacer(),
           Padding(
@@ -540,7 +541,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
       child: BottomNavigationBar(
         currentIndex: 2,
         onTap: (index) {
-          if (index == 0) context.go('/');
+          if (index == 0) context.go('/admin-dashboard');
           if (index == 1) context.go('/admin-menu');
         },
         selectedItemColor: RSColors.primary,
