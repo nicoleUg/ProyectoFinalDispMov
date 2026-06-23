@@ -7,6 +7,7 @@ import '../bloc/admin_menu_event.dart';
 import '../bloc/admin_menu_state.dart';
 import '../../../menu/domain/entities/category_entity.dart';
 import '../../../menu/domain/entities/product_entity.dart';
+import '../../../admin_reports/presentation/widgets/admin_drawer.dart';
 
 class GestiNDeMenAppAdmin extends StatefulWidget {
   const GestiNDeMenAppAdmin({super.key});
@@ -17,6 +18,7 @@ class GestiNDeMenAppAdmin extends StatefulWidget {
 
 class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
   String? _selectedCategoryId;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -29,10 +31,17 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
     final isDesktop = MediaQuery.of(context).size.width >= 768;
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: RSColors.background,
+      drawer: isDesktop
+          ? null
+          : const Drawer(
+              child: AdminDrawer(activeRoute: '/admin-menu', isMobileDrawer: true),
+            ),
       body: Row(
         children: [
-          if (isDesktop) _buildDesktopDrawer(),
+          if (isDesktop)
+            const AdminDrawer(activeRoute: '/admin-menu', isMobileDrawer: false),
           Expanded(
             child: Column(
               children: [
@@ -113,132 +122,6 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
     );
   }
 
-  Widget _buildDesktopDrawer() {
-    return Container(
-      width: 280,
-      decoration: BoxDecoration(
-        color: RSColors.surfaceContainerLow,
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(2, 0),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Restaurante SaaS',
-                  style: RSTypography.titleLarge.copyWith(
-                    color: RSColors.primary,
-                  ),
-                ),
-                RSSpacing.verticalMd,
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: RSColors.outlineVariant.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.store, color: RSColors.textOnSurfaceVariant),
-                    ),
-                    RSSpacing.horizontalSm,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Store #104 - Admin',
-                          style: RSTypography.titleSmall.copyWith(
-                            color: RSColors.textOnSurfaceVariant,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: RSColors.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            RSSpacing.horizontalSm,
-                            Text(
-                              'Active',
-                              style: RSTypography.labelSmall.copyWith(
-                                color: RSColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildDrawerItem(Icons.dashboard_outlined, 'Dashboard', false, () => context.go('/admin-dashboard')),
-          _buildDrawerItem(Icons.restaurant_menu, 'Menu Editor', true, () {}),
-          _buildDrawerItem(Icons.receipt_long, 'Kitchen Board', false, () => context.go('/admin-orders')),
-          _buildDrawerItem(Icons.bar_chart, 'Reports', false, () => context.go('/admin-reports')),
-          _buildDrawerItem(Icons.settings_outlined, 'Settings', false, () {}),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Text(
-              'v1.0.0-SaaS',
-              style: RSTypography.labelSmall.copyWith(
-                color: RSColors.textOnSurfaceVariant.withOpacity(0.5),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDrawerItem(IconData icon, String title, bool isActive, VoidCallback onTap) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: isActive ? RSColors.primary.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: isActive ? RSColors.primary : RSColors.textOnSurfaceVariant,
-        ),
-        title: Text(
-          title,
-          style: RSTypography.titleSmall.copyWith(
-            color: isActive ? RSColors.primary : RSColors.textOnSurfaceVariant,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-          ),
-        ),
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      ),
-    );
-  }
-
   Widget _buildHeader(bool isDesktop) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -248,9 +131,13 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
         child: Row(
           children: [
             if (!isDesktop)
-              IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () {},
+              Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  );
+                },
               ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

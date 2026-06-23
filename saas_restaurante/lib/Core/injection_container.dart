@@ -32,6 +32,7 @@ import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/domain/usescases/add_to_cart_usecase.dart';
 import '../../features/cart/domain/usescases/get_cart_items_usecase.dart';
 import '../../features/cart/domain/usescases/update_cart_quantity_usecase.dart';
+import '../../features/cart/domain/usescases/clear_cart_usecase.dart';
 import '../../features/cart/domain/repositories/cart_repository.dart';
 import '../../features/cart/data/repositories/cart_repository_impl.dart';
 import '../../features/cart/data/datasources/cart_local_datasource.dart';
@@ -102,11 +103,13 @@ Future<void> init() async {
     addToCartUseCase: sl(),
     getCartItemsUseCase: sl(),
     updateQuantityUseCase: sl(),
+    clearCartUseCase: sl(),
   ));
 
   sl.registerLazySingleton(() => AddToCartUseCase(sl()));
   sl.registerLazySingleton(() => GetCartItemsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateCartQuantityUseCase(sl())); 
+  sl.registerLazySingleton(() => ClearCartUseCase(sl()));
 
   sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
   sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));

@@ -3,6 +3,7 @@ import '../../domain/entities/cart_item_entity.dart';
 import '../../domain/usescases/add_to_cart_usecase.dart';
 import '../../domain/usescases/get_cart_items_usecase.dart';
 import '../../domain/usescases/update_cart_quantity_usecase.dart';
+import '../../domain/usescases/clear_cart_usecase.dart';
 
 class CartState {
   final List<CartItemEntity> items;
@@ -16,11 +17,13 @@ class CartCubit extends Cubit<CartState> {
   final AddToCartUseCase addToCartUseCase;
   final GetCartItemsUseCase getCartItemsUseCase;
   final UpdateCartQuantityUseCase updateQuantityUseCase;
+  final ClearCartUseCase clearCartUseCase;
 
   CartCubit({
     required this.addToCartUseCase,
     required this.getCartItemsUseCase,
     required this.updateQuantityUseCase,
+    required this.clearCartUseCase,
   }) : super(CartState(items: []));
 
   Future<void> loadCart() async {
@@ -36,6 +39,11 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> updateQuantity(String productId, int quantity) async {
     await updateQuantityUseCase.call(productId, quantity);
+    await loadCart();
+  }
+
+  Future<void> clearCart() async {
+    await clearCartUseCase.call();
     await loadCart();
   }
 }
