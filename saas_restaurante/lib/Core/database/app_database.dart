@@ -71,7 +71,16 @@ class FavoritesTable extends Table {
 
 @DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable, OrdersTable, OrderItemsTable, ReviewsTable, FavoritesTable])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(driftDatabase(name: 'restauranteX_db'));
+  AppDatabase()
+      : super(
+          driftDatabase(
+            name: 'restauranteX_db',
+            web: DriftWebOptions(
+              sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+              driftWorker: Uri.parse('drift_worker.js'),
+            ),
+          ),
+        );
 
   @override
   int get schemaVersion => 6;
