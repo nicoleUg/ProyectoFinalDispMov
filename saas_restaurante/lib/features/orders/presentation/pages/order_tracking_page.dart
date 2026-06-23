@@ -5,6 +5,7 @@ import '../bloc/orders_bloc.dart';
 import '../bloc/orders_event.dart';
 import '../bloc/orders_state.dart';
 import '../../domain/entities/order_entity.dart';
+import '../../../reviews/presentation/widgets/rating_dialog.dart';
 
 class OrderTrackingPage extends StatefulWidget {
   /// When provided (via deeplink `restaurantesaas://orders/:orderId`),
@@ -220,6 +221,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                 const SizedBox(height: 16),
                 _buildDeeplinkInfo(order),
               ],
+              // ── Botón de calificación (sólo cuando el pedido está listo) ─
+              if (isReady) ...[
+                const SizedBox(height: 16),
+                _buildRateCard(order),
+              ],
               const SizedBox(height: 24),
             ],
           ),
@@ -227,6 +233,57 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       ),
     );
   }
+
+  Widget _buildRateCard(OrderEntity order) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFB300).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFFB300).withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.star_rounded, color: Color(0xFFFFB300), size: 20),
+              const SizedBox(width: 8),
+              Text(
+                '¿Cómo estuvo tu pedido?',
+                style: RSTypography.labelMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF6D4C00),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Califica los platos que recibiste.',
+            style: RSTypography.bodySmall.copyWith(
+              color: RSColors.textOnSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Un botón por cada item del pedido
+          ...order.items.map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: RSButton.tonal(
+                  label: '⭐ Calificar: ${item.productName}',
+                  onPressed: () => showRatingDialog(
+                    context,
+                    // El productId no está en OrderItemEntity, usamos el nombre como clave temporal
+                    productId: item.productName.toLowerCase().replaceAll(' ', '_'),
+                    productName: item.productName,
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildStatusHero(String status) {
     final isReady = status == 'ready';
