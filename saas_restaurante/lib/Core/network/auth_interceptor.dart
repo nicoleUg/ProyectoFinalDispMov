@@ -14,7 +14,11 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
     
-    options.headers['Content-Type'] = 'application/json';
+    if (options.data is FormData) {
+      options.headers.remove('Content-Type');
+    } else {
+      options.headers['Content-Type'] = 'application/json';
+    }
     options.headers['Accept'] = 'application/json';
     
     return handler.next(options);

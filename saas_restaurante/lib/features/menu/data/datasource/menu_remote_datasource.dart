@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 abstract class MenuRemoteDataSource {
   Future<Map<String, dynamic>> fetchMenu();
 
-  // --- MÉTODOS DE PRODUCTOS ---
   Future<void> createProductWithImage({
     required String categoryId,
     required String name,
@@ -25,7 +24,6 @@ abstract class MenuRemoteDataSource {
 
   Future<void> deleteProduct(String productId);
 
-  // --- MÉTODOS DE CATEGORÍAS ---
   Future<void> createCategoryWithImage({
     required String name,
     required int orderIndex,
@@ -52,19 +50,20 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
     return response.data;
   }
 
-  // HELPER MÁGICO: Procesa la imagen correctamente en Web (bytes) o Móvil (ruta)
+  // --- ESTE ES EL CONVERSOR DE FLUTTER ---
+  // Transforma la ruta de la imagen en un Archivo real que el backend pueda entender
   Future<MultipartFile?> _prepareImage(String? path) async {
     if (path == null || path.isEmpty) return null;
     
     if (kIsWeb) {
-      // En Web extraemos los bytes del Blob local temporal
+      // Si estamos en Chrome/Web, sacamos los bytes de la imagen
       final response = await Dio().get(
         path,
         options: Options(responseType: ResponseType.bytes),
       );
       return MultipartFile.fromBytes(response.data, filename: 'image.jpg');
     } else {
-      // En Android/iOS usamos el archivo directamente
+      // Si estamos en Android/iOS, mandamos el archivo normal
       return await MultipartFile.fromFile(path, filename: 'image.jpg');
     }
   }
@@ -77,17 +76,19 @@ class MenuRemoteDataSourceImpl implements MenuRemoteDataSource {
     required double price,
     required String? localImagePath,
   }) async {
+    // 1. Preparamos el archivo de la imagen
     final imageFile = await _prepareImage(localImagePath);
 
+    // 2. Empaquetamos todo en un FormData (como si fuera un formulario web)
     final formData = FormData.fromMap({
       'categoryId': categoryId,
       'name': name,
       'description': description,
-      // IMPORTANTE: Convierte el número a String para evitar el Error 400
-      'price': price.toString(),
-      if (imageFile != null) 'image': imageFile,
+      'price': price.toString(), // Convertimos a texto para que viaje bien
+      if (imageFile != null) 'image': imageFile, // 'image' debe coincidir con NestJS
     });
 
+    // 3. Lo enviamos al backend
     await dio.post('/menu/products', data: formData);
   }
 

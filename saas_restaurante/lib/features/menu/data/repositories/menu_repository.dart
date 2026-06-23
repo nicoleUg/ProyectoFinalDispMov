@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart' show XFile;
 import '../../../../Core/network/api_client.dart';
 import '../models/category_model.dart';
 import '../models/product_model.dart';
@@ -50,12 +51,9 @@ class MenuRepository {
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -95,12 +93,9 @@ class MenuRepository {
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -146,12 +141,9 @@ class MenuRepository {
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -203,12 +195,9 @@ class MenuRepository {
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
