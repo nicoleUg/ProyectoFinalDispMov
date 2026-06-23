@@ -77,6 +77,8 @@ class _QrScannerPageState extends State<QrScannerPage>
     _hasScanned = true;
     // Feedback háptico al detectar QR
     HapticFeedback.mediumImpact();
+    // Segundo pulso tras 200ms para efecto "double tap"
+    Future.delayed(const Duration(milliseconds: 200), HapticFeedback.lightImpact);
 
     context.read<TableScannerBloc>().add(QrCodeDetected(barcode!.rawValue!));
   }
@@ -129,7 +131,16 @@ class _QrScannerPageState extends State<QrScannerPage>
             if (state is TableScannerPermissionGranted ||
                 state is TableScannerQrDetected ||
                 state is TableScannerNavigating) {
-              return _buildScanner();
+              return Stack(
+                children: [
+                  _buildScanner(),
+                  // Flash verde de éxito cuando se detecta QR válido
+                  if (state is TableScannerQrDetected && state.tableId != null)
+                    _buildSuccessFlash(state.tableId!),
+                  if (state is TableScannerNavigating)
+                    _buildSuccessFlash(state.tableId),
+                ],
+              );
             }
 
             return _buildLoading();
@@ -370,6 +381,81 @@ class _QrScannerPageState extends State<QrScannerPage>
         style: RSTypography.titleMedium.copyWith(
           fontWeight: FontWeight.bold,
           color: RSColors.primary,
+        ),
+      ),
+    );
+  }
+
+  /// Flash verde semitransparente con el número de mesa.
+  /// Se muestra brevemente cuando el QR es reconocido como válido.
+  Widget _buildSuccessFlash(String tableId) {
+    return Positioned.fill(
+      child: Container(
+        color: const Color(0xFF1B5E20).withOpacity(0.88),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Animated check icon
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 400),
+              curve: Curves.elasticOut,
+              builder: (_, value, child) => Transform.scale(
+                scale: value,
+                child: child,
+              ),
+              child: Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.15),
+                  border: Border.all(color: Colors.white38, width: 2),
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 52,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '¡QR Reconocido!',
+              style: RSTypography.headlineSmall.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.table_restaurant_rounded,
+                      color: Colors.white70, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Mesa  #$tableId',
+                    style: RSTypography.titleLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Configurando tu mesa...',
+              style: RSTypography.bodyMedium.copyWith(color: Colors.white70),
+            ),
+          ],
         ),
       ),
     );

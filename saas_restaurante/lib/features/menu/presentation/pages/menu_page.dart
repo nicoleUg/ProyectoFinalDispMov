@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
 import '../blocs/menu_bloc.dart';
 import '../blocs/menu_event.dart';
 import '../blocs/menu_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/domain/entities/cart_item_entity.dart';
 import '../../../deeplinking/presentation/widgets/deeplink_simulator_dialog.dart';
+import '../../../../Core/injection_container.dart' as di;
+import '../../../../Core/secure_storage/secure_storage_service.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -17,12 +20,21 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   final Color primaryColor = const Color(0xFFB02F00);
+  String? _currentTableId;
 
   @override
   void initState() {
     super.initState();
-    // Apenas se abre la pantalla, le pedimos al BLoC que traiga los datos de NestJS
     context.read<MenuBloc>().add(LoadMenuRequested());
+    _loadCurrentTable();
+  }
+
+  Future<void> _loadCurrentTable() async {
+    final storage = di.sl<SecureStorageService>();
+    final tableId = await storage.getTableId();
+    if (mounted) {
+      setState(() => _currentTableId = tableId);
+    }
   }
 
   @override
@@ -89,6 +101,45 @@ class _MenuPageState extends State<MenuPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // --- INDICADOR DE MESA ACTIVA ---
+                if (_currentTableId != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    color: const Color(0xFF1B5E20).withOpacity(0.08),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B5E20).withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.table_restaurant_rounded,
+                              size: 16, color: Color(0xFF1B5E20)),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Mesa #$_currentTableId activa',
+                          style: RSTypography.labelMedium.copyWith(
+                            color: const Color(0xFF1B5E20),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => context.go('/scanner'),
+                          child: Text(
+                            'Cambiar',
+                            style: RSTypography.labelSmall.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 // --- CINTA DE CATEGORÍAS ---
                 SizedBox(
                   height: 60,
