@@ -44,8 +44,15 @@ class MainLayout extends StatelessWidget {
                   activeColor: primaryContainer,
                   onTap: () => context.go('/'),
                 ),
+                _NavItem(
+                  icon: Icons.favorite,
+                  label: 'Favoritos',
+                  isActive: location == '/favorites',
+                  activeColor: primaryContainer,
+                  onTap: () => context.go('/favorites'),
+                ),
                 // Espacio para el FAB central
-                const SizedBox(width: 64),
+                const SizedBox(width: 48),
                 _NavItem(
                   icon: Icons.receipt_long,
                   label: 'Pedidos',
