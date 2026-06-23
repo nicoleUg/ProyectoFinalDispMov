@@ -26,9 +26,13 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
     // 2. Query all local orders
     final allOrders = await (db.select(db.ordersTable)).get();
     
-    // If there are no orders at all, return high-fidelity mock report metrics
     if (allOrders.isEmpty) {
-      return _getFallbackMockReport(period);
+      return ReportDataEntity(
+        totalEarnings: 0.0,
+        totalOrders: 0,
+        popularDishes: const [],
+        dailySales: const [],
+      );
     }
 
     // 3. Define cutoff date based on period
@@ -45,7 +49,12 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
     // 4. Filter orders
     final filteredOrders = allOrders.where((o) => o.createdAt.isAfter(cutoff)).toList();
     if (filteredOrders.isEmpty) {
-      return _getFallbackMockReport(period);
+      return ReportDataEntity(
+        totalEarnings: 0.0,
+        totalOrders: 0,
+        popularDishes: const [],
+        dailySales: const [],
+      );
     }
 
     // 5. Aggregate earnings & count
@@ -121,59 +130,6 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
     return ReportDataEntity(
       totalEarnings: totalEarnings,
       totalOrders: totalOrdersCount,
-      popularDishes: popularDishes,
-      dailySales: dailySales,
-    );
-  }
-
-  ReportDataEntity _getFallbackMockReport(String period) {
-    // Return high-fidelity pre-filled mock report statistics
-    final List<PopularDishEntity> popularDishes = [
-      PopularDishEntity(name: 'Hamburguesa Doble Queso', quantitySold: 42, earnings: 504.0),
-      PopularDishEntity(name: 'Pizza Pepperoni Familiar', quantitySold: 28, earnings: 686.0),
-      PopularDishEntity(name: 'Papas Fritas Medianas', quantitySold: 35, earnings: 140.0),
-      PopularDishEntity(name: 'Ensalada César con Pollo', quantitySold: 18, earnings: 225.0),
-      PopularDishEntity(name: 'Jugo Natural Maracuyá', quantitySold: 30, earnings: 90.0),
-    ];
-
-    List<DailySaleEntity> dailySales = [];
-    double totalEarnings = 1645.0;
-    int totalOrders = 153;
-
-    if (period == 'today') {
-      totalEarnings = 425.0;
-      totalOrders = 35;
-      dailySales = [
-        DailySaleEntity(dayLabel: '08:00', salesAmount: 45.0),
-        DailySaleEntity(dayLabel: '12:00', salesAmount: 180.0),
-        DailySaleEntity(dayLabel: '16:00', salesAmount: 90.0),
-        DailySaleEntity(dayLabel: '20:00', salesAmount: 110.0),
-      ];
-    } else if (period == 'week') {
-      totalEarnings = 2850.0;
-      totalOrders = 240;
-      dailySales = [
-        DailySaleEntity(dayLabel: 'Lun', salesAmount: 320.0),
-        DailySaleEntity(dayLabel: 'Mar', salesAmount: 410.0),
-        DailySaleEntity(dayLabel: 'Mié', salesAmount: 350.0),
-        DailySaleEntity(dayLabel: 'Jue', salesAmount: 480.0),
-        DailySaleEntity(dayLabel: 'Vie', salesAmount: 620.0),
-        DailySaleEntity(dayLabel: 'Sáb', salesAmount: 670.0),
-      ];
-    } else {
-      // Month
-      dailySales = [
-        DailySaleEntity(dayLabel: '05 Jun', salesAmount: 1200.0),
-        DailySaleEntity(dayLabel: '10 Jun', salesAmount: 1500.0),
-        DailySaleEntity(dayLabel: '15 Jun', salesAmount: 1100.0),
-        DailySaleEntity(dayLabel: '20 Jun', salesAmount: 1800.0),
-        DailySaleEntity(dayLabel: '25 Jun', salesAmount: 2100.0),
-      ];
-    }
-
-    return ReportDataEntity(
-      totalEarnings: totalEarnings,
-      totalOrders: totalOrders,
       popularDishes: popularDishes,
       dailySales: dailySales,
     );

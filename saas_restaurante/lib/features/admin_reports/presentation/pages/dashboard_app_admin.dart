@@ -113,8 +113,8 @@ class _DashboardAppAdminState extends State<DashboardAppAdmin> {
   Widget _buildSummaryCards() {
     return BlocBuilder<AdminReportsBloc, AdminReportsState>(
       builder: (context, state) {
-        double earnings = 1645.0;
-        int orders = 153;
+        double earnings = 0.0;
+        int orders = 0;
 
         if (state is AdminReportsLoaded) {
           earnings = state.reportData.totalEarnings;

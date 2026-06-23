@@ -22,6 +22,8 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       final tableId = await secureStorage.getTableId();
       final tableNumber = int.tryParse(tableId ?? '0') ?? 0;
 
+      print('[OrdersBloc] Confirmando pedido de mesa. tableId recuperado: "$tableId", tableNumber: $tableNumber');
+
       final orderItems = event.cartItems.map((c) => OrderItemEntity(
         productName: c.name,
         quantity: c.quantity,

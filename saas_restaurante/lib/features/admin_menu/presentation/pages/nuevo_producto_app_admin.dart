@@ -253,10 +253,16 @@ class _NuevoProductoAppAdminState extends State<NuevoProductoAppAdmin> {
                                 // Description Input
                                 RSTextField(
                                   controller: _descriptionController,
-                                  labelText: 'Descripción',
+                                  labelText: 'Descripción *',
                                   hintText: 'Descripción detallada de los ingredientes...',
                                   enabled: !isLoading,
                                   maxLines: 3,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'La descripción es obligatoria';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 RSSpacing.verticalMd,
 

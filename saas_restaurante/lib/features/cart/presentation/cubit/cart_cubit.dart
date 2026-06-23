@@ -28,22 +28,50 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> loadCart() async {
     emit(CartState(items: state.items, isLoading: true));
-    final items = await getCartItemsUseCase.call();
-    emit(CartState(items: items, isLoading: false));
+    try {
+      final items = await getCartItemsUseCase.call();
+      print('[CartCubit] Carrito cargado exitosamente. Cantidad de items: ${items.length}');
+      emit(CartState(items: items, isLoading: false));
+    } catch (e, stack) {
+      print('[CartCubit] ERROR al cargar el carrito: $e');
+      print(stack);
+      emit(CartState(items: [], isLoading: false));
+    }
   }
 
   Future<void> addItem(CartItemEntity item) async {
-    await addToCartUseCase.call(item);
-    await loadCart();
+    try {
+      print('[CartCubit] Intentando añadir item al carrito: ${item.name} (ID: ${item.productId})');
+      await addToCartUseCase.call(item);
+      print('[CartCubit] Item añadido correctamente a la base de datos');
+      await loadCart();
+    } catch (e, stack) {
+      print('[CartCubit] ERROR al añadir item al carrito: $e');
+      print(stack);
+    }
   }
 
   Future<void> updateQuantity(String productId, int quantity) async {
-    await updateQuantityUseCase.call(productId, quantity);
-    await loadCart();
+    try {
+      print('[CartCubit] Intentando actualizar cantidad de ID: $productId a $quantity');
+      await updateQuantityUseCase.call(productId, quantity);
+      print('[CartCubit] Cantidad actualizada correctamente');
+      await loadCart();
+    } catch (e, stack) {
+      print('[CartCubit] ERROR al actualizar cantidad: $e');
+      print(stack);
+    }
   }
 
   Future<void> clearCart() async {
-    await clearCartUseCase.call();
-    await loadCart();
+    try {
+      print('[CartCubit] Intentando vaciar el carrito');
+      await clearCartUseCase.call();
+      print('[CartCubit] Carrito vaciado correctamente');
+      await loadCart();
+    } catch (e, stack) {
+      print('[CartCubit] ERROR al vaciar el carrito: $e');
+      print(stack);
+    }
   }
 }

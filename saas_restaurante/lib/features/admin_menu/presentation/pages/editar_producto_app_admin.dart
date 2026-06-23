@@ -273,9 +273,15 @@ class _EditarProductoAppAdminState extends State<EditarProductoAppAdmin> {
                                 // Description Input
                                 RSTextField(
                                   controller: _descriptionController,
-                                  labelText: 'Descripción',
+                                  labelText: 'Descripción *',
                                   enabled: !isLoading,
                                   maxLines: 3,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'La descripción es obligatoria';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 RSSpacing.verticalMd,
 
