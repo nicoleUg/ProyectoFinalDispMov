@@ -75,9 +75,7 @@ class _MenuPageState extends State<MenuPage> {
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              // Aquí navegaremos al carrito más adelante
-            },
+            onPressed: () => context.push('/cart'),
           )
         ],
       ),
