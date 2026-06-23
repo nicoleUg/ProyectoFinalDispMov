@@ -17,6 +17,8 @@ import '../../../features/admin_reports/presentation/pages/reporte_de_ventas_app
 import '../../../features/deeplinking/presentation/pages/table_handler_page.dart';
 import '../../../features/table_scanner/presentation/pages/qr_scanner_page.dart';
 import '../../../features/favorites/presentation/pages/favorites_page.dart';
+import '../../../features/configuracion-informacion/presentation/pages/about_us_page.dart';
+import '../../../features/configuracion-informacion/presentation/pages/terms_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -112,6 +114,14 @@ class AppRouter {
           GoRoute(
             path: '/favorites',
             builder: (context, state) => const FavoritesPage(),
+          ),
+          GoRoute(
+            path: '/about-us',
+            builder: (context, state) => const AboutUsPage(),
+          ),
+          GoRoute(
+            path: '/terms',
+            builder: (context, state) => const TermsPage(),
           ),
         ],
       ),
