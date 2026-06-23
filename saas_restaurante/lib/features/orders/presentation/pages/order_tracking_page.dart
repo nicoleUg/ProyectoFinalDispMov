@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
 import '../bloc/orders_bloc.dart';
 import '../bloc/orders_event.dart';
 import '../bloc/orders_state.dart';
+import '../../domain/entities/order_entity.dart';
 
 class OrderTrackingPage extends StatefulWidget {
-  const OrderTrackingPage({super.key});
+  /// When provided (via deeplink `restaurantesaas://orders/:orderId`),
+  /// only the matching order will be shown. Otherwise shows the first active order.
+  final String? orderId;
+  const OrderTrackingPage({super.key, this.orderId});
 
   @override
   State<OrderTrackingPage> createState() => _OrderTrackingPageState();
 }
 
 class _OrderTrackingPageState extends State<OrderTrackingPage> {
-  final primary = const Color(0xFFB02F00);
-  final background = const Color(0xFFF8F9FA);
+  final primary = RSColors.primary;
+  final background = RSColors.background;
+
+  bool get _isDeeplinkMode => widget.orderId != null && widget.orderId!.isNotEmpty;
 
   @override
   void initState() {
@@ -28,46 +35,84 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
-        title: Text('Restaurante SaaS', style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Seguimiento de Pedido',
+              style: RSTypography.titleMedium.copyWith(
+                color: primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (_isDeeplinkMode)
+              Text(
+                'ID: ${widget.orderId}',
+                style: RSTypography.labelSmall.copyWith(
+                  color: RSColors.textOnSurfaceVariant,
+                ),
+              ),
+          ],
+        ),
+        // Badge when opened via deeplink
+        actions: _isDeeplinkMode
+            ? [
+                Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: RSColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: RSColors.primary.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.link_rounded, size: 14, color: RSColors.primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Deeplink',
+                        style: RSTypography.labelSmall.copyWith(
+                          color: RSColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ]
+            : null,
       ),
       body: BlocBuilder<OrdersBloc, OrdersState>(
         builder: (context, state) {
           if (state is OrdersLoading) {
             return Center(child: CircularProgressIndicator(color: primary));
           }
-          
+
           if (state is OrdersError) {
-            return Center(child: Text('Error: ${state.message}'));
+            return _buildError(state.message);
           }
 
           if (state is MyOrdersLoaded) {
             if (state.orders.isEmpty) {
-              return const Center(child: Text('No tienes órdenes activas.', style: TextStyle(fontSize: 16)));
+              return _buildEmpty();
             }
 
-            final currentOrder = state.orders.first;
-            final isPreparing = currentOrder.status == 'preparing';
-            final isReady = currentOrder.status == 'ready';
+            // ── Filter by orderId when in deeplink mode ──────────────────────
+            OrderEntity? targetOrder;
+            if (_isDeeplinkMode) {
+              try {
+                targetOrder = state.orders.firstWhere(
+                  (o) => o.id == widget.orderId,
+                );
+              } catch (_) {
+                return _buildNotFoundOrder();
+              }
+            } else {
+              targetOrder = state.orders.first;
+            }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 450),
-                  child: Column(
-                    children: [
-                      _buildStatusHero(currentOrder.status),
-                      const SizedBox(height: 24),
-                      
-                      _buildTimelineCard(isPreparing, isReady),
-                      const SizedBox(height: 24),
-
-                      _buildOrderSummary(currentOrder),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return _buildOrderView(targetOrder);
           }
           return const SizedBox.shrink();
         },
@@ -75,75 +120,243 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     );
   }
 
+  // ─────────────────────── Empty States ────────────────────────────────────
+
+  Widget _buildEmpty() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: RSColors.surfaceVariant,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.receipt_long_outlined, size: 56, color: RSColors.textOnSurfaceVariant),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Sin pedidos activos',
+            style: RSTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Cuando hagas un pedido, podrás seguir\nsu estado aquí.',
+            style: RSTypography.bodyMedium.copyWith(color: RSColors.textOnSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text('Error: $message', style: RSTypography.bodyMedium),
+          const SizedBox(height: 16),
+          RSButton.tonal(
+            label: 'Reintentar',
+            onPressed: () => context.read<OrdersBloc>().add(LoadMyOrdersRequested()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotFoundOrder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: RSColors.primary.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.search_off_rounded, size: 56, color: RSColors.primary),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Pedido no encontrado',
+            style: RSTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'No existe un pedido con el ID:\n${widget.orderId}',
+            style: RSTypography.bodyMedium.copyWith(color: RSColors.textOnSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─────────────────────── Main Order View ──────────────────────────────────
+
+  Widget _buildOrderView(OrderEntity order) {
+    final isPreparing = order.status == 'preparing';
+    final isReady = order.status == 'ready';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            children: [
+              _buildStatusHero(order.status),
+              const SizedBox(height: 24),
+              _buildTimelineCard(isPreparing, isReady),
+              const SizedBox(height: 24),
+              _buildOrderSummary(order),
+              if (_isDeeplinkMode) ...[
+                const SizedBox(height: 16),
+                _buildDeeplinkInfo(order),
+              ],
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatusHero(String status) {
-    String title = status == 'ready' ? 'Order Ready!' : 'Preparing Order';
+    final isReady = status == 'ready';
+    final isPreparing = status == 'preparing';
+
+    String title = isReady
+        ? '¡Pedido Listo!'
+        : isPreparing
+            ? 'En Preparación'
+            : 'Pedido Recibido';
+
+    String subtitle = isReady
+        ? 'Tu pedido está listo para recoger.'
+        : isPreparing
+            ? 'El equipo está preparando tu pedido.'
+            : 'Hemos recibido tu pedido correctamente.';
+
+    Color statusColor = isReady
+        ? const Color(0xFF1B5E20)
+        : isPreparing
+            ? const Color(0xFFE65100)
+            : RSColors.primary;
+
     return Container(
       height: 160,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=500'),
-          fit: BoxFit.cover,
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [statusColor.withOpacity(0.8), statusColor],
         ),
       ),
       child: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-              ),
-            ),
+          Positioned.fill(
+            child: CustomPaint(painter: _CirclePatternPainter()),
           ),
-          Positioned(
-            bottom: 16,
-            left: 16,
+          Padding(
+            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                const Text('Estimated arrival: 7:45 PM', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        isReady ? Icons.check_circle_rounded : Icons.restaurant_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            subtitle,
+                            style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
   Widget _buildTimelineCard(bool isPreparing, bool isReady) {
-    double progress = isReady ? 1.0 : (isPreparing ? 0.5 : 0.0);
+    double progress = isReady ? 1.0 : (isPreparing ? 0.5 : 0.1);
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE4BEB4)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(height: 4, color: Colors.grey.shade200),
-            FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: progress,
-              child: Container(height: 4, color: primary),
+    return RSCard(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Estado del Pedido',
+            style: RSTypography.labelMedium.copyWith(
+              color: RSColors.textOnSurfaceVariant,
+              letterSpacing: 0.8,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildNode(Icons.check, 'Received', true, isActive: !isPreparing && !isReady),
-                _buildNode(Icons.restaurant, 'Preparing', isPreparing || isReady, isActive: isPreparing),
-                _buildNode(Icons.directions_bike, 'Ready', isReady, isActive: isReady),
-              ],
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(height: 4, color: RSColors.surfaceVariant),
+              FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: progress,
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: RSColors.primary,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildNode(Icons.check_rounded, 'Recibido', true, isActive: !isPreparing && !isReady),
+                  _buildNode(Icons.restaurant_rounded, 'Preparando', isPreparing || isReady, isActive: isPreparing),
+                  _buildNode(Icons.done_all_rounded, 'Listo', isReady, isActive: isReady),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -152,80 +365,174 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     return Column(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
-            color: isCompleted || isActive ? primary : Colors.grey.shade300,
+            color: isCompleted || isActive ? RSColors.primary : RSColors.surfaceVariant,
             shape: BoxShape.circle,
-            border: isActive ? Border.all(color: const Color(0xFFFF5722), width: 3) : null,
+            border: isActive
+                ? Border.all(color: RSColors.primary.withOpacity(0.4), width: 4)
+                : null,
           ),
-          child: Icon(icon, color: isCompleted || isActive ? Colors.white : Colors.grey, size: 20),
+          child: Icon(
+            icon,
+            color: isCompleted || isActive ? Colors.white : RSColors.textOnSurfaceVariant,
+            size: 20,
+          ),
         ),
         const SizedBox(height: 8),
-        Text(label, style: TextStyle(fontSize: 11, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+        Text(
+          label,
+          style: RSTypography.labelSmall.copyWith(
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            color: isActive ? RSColors.primary : RSColors.textOnSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildOrderSummary(order) {
-    final shortId = order.id.toString().substring(0, 4).toUpperCase();
-    
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE4BEB4)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('ORDER NUMBER', style: TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1.2)),
-                    Text('#$shortId', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                if (!order.isSynced)
-                  const Row(
-                    children: [
-                      Icon(Icons.cloud_off, color: Colors.orange, size: 16),
-                      SizedBox(width: 4),
-                      Text('Pending Sync', style: TextStyle(color: Colors.orange, fontSize: 12)),
-                    ],
-                  ),
-              ],
-            ),
-            const Divider(height: 32),
-            
-            ...order.items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
+  Widget _buildOrderSummary(OrderEntity order) {
+    final shortId = order.id.length >= 6
+        ? order.id.substring(0, 6).toUpperCase()
+        : order.id.toUpperCase();
+
+    return RSCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
-                    child: Text('${item.quantity}x', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(
+                    'NÚMERO DE PEDIDO',
+                    style: RSTypography.labelSmall.copyWith(
+                      color: RSColors.textOnSurfaceVariant,
+                      letterSpacing: 1.2,
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  Text(item.productName, style: const TextStyle(fontSize: 16)),
+                  Text(
+                    '#$shortId',
+                    style: RSTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
-            )).toList(),
-            
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text('Total: \$${order.total.toStringAsFixed(2)}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primary)),
-            )
-          ],
-        ),
+              if (!order.isSynced)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.cloud_off_rounded, color: Colors.orange.shade700, size: 14),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Sin sincronizar',
+                        style: RSTypography.labelSmall.copyWith(color: Colors.orange.shade700),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: RSColors.surfaceVariant),
+          const SizedBox(height: 16),
+
+          // Items list
+          ...order.items.map((item) => Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: RSColors.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${item.quantity}x',
+                        style: RSTypography.labelMedium.copyWith(
+                          color: RSColors.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        item.productName,
+                        style: RSTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+
+          const SizedBox(height: 12),
+          Container(height: 1, color: RSColors.surfaceVariant),
+          const SizedBox(height: 12),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'Total: Bs. ${order.total.toStringAsFixed(2)}',
+              style: RSTypography.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: RSColors.primary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildDeeplinkInfo(OrderEntity order) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: RSColors.primary.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: RSColors.primary.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded, size: 18, color: RSColors.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Pantalla abierta vía deeplink:\nrestaurantesaas://orders/${order.id}',
+              style: RSTypography.labelSmall.copyWith(
+                color: RSColors.primary,
+                height: 1.5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Simple decorative circle pattern painter for the status hero
+class _CirclePatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.06)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.85, size.height * 0.1), 60, paint);
+    canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.9), 40, paint);
+  }
+
+  @override
+  bool shouldRepaint(_) => false;
 }

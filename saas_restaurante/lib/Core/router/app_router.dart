@@ -4,6 +4,7 @@ import '../layout/main_layout.dart';
 import '../../../features/auth/presentation/pages/login_page.dart';
 import '../../../features/auth/presentation/pages/register_page.dart';
 import '../../../features/menu/presentation/pages/menu_page.dart';
+import '../../../features/menu/presentation/pages/product_detail_page.dart';
 import '../../../features/cart/presentation/pages/cart_page.dart';
 import '../../../features/orders/presentation/pages/order_tracking_page.dart';
 import '../../../features/admin_menu/presentation/pages/gesti_n_de_men_app_admin.dart';
@@ -13,6 +14,7 @@ import '../../../features/menu/domain/entities/product_entity.dart';
 import '../../../features/admin_orders/presentation/pages/pedidos_app_admin.dart';
 import '../../../features/admin_reports/presentation/pages/dashboard_app_admin.dart';
 import '../../../features/admin_reports/presentation/pages/reporte_de_ventas_app_admin.dart';
+import '../../../features/deeplinking/presentation/pages/table_handler_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -63,6 +65,28 @@ class AppRouter {
       GoRoute(
         path: '/admin-orders',
         builder: (context, state) => const PedidosAppAdmin(),
+      ),
+      // ─── Deeplink Routes ───────────────────────────────────────────────────
+      GoRoute(
+        path: '/table/:tableId',
+        builder: (context, state) {
+          final tableId = state.pathParameters['tableId'] ?? '0';
+          return TableHandlerPage(tableId: tableId);
+        },
+      ),
+      GoRoute(
+        path: '/product/:productId',
+        builder: (context, state) {
+          final productId = state.pathParameters['productId'] ?? '';
+          return ProductDetailPage(productId: productId);
+        },
+      ),
+      GoRoute(
+        path: '/orders/:orderId',
+        builder: (context, state) {
+          final orderId = state.pathParameters['orderId'];
+          return OrderTrackingPage(orderId: orderId);
+        },
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

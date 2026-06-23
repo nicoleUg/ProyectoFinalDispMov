@@ -20,4 +20,16 @@ class SecureStorageService {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
   }
+
+  static const _tableIdKey = 'scanned_table_id';
+
+  Future<void> saveTableId(String tableId) async {
+    await _storage.write(key: _tableIdKey, value: tableId);
+  }
+
+  Future<String?> getTableId() async => await _storage.read(key: _tableIdKey);
+
+  Future<void> clearTableId() async {
+    await _storage.delete(key: _tableIdKey);
+  }
 }

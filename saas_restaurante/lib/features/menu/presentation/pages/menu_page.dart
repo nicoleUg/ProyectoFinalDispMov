@@ -5,6 +5,7 @@ import '../blocs/menu_event.dart';
 import '../blocs/menu_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/domain/entities/cart_item_entity.dart';
+import '../../../deeplinking/presentation/widgets/deeplink_simulator_dialog.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -33,6 +34,16 @@ class _MenuPageState extends State<MenuPage> {
         foregroundColor: primaryColor,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.link),
+            tooltip: 'Simular Deeplink',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const DeeplinkSimulatorDialog(),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),
             onPressed: () {
