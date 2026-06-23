@@ -68,9 +68,11 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
             );
           }
           
+          final String productId = prodData != null ? prodData['id'] as String : (item['productId'] ?? '') as String;
+          
           return FavoriteEntity(
-            id: item['id'], // ID del registro en Postgres
-            productId: item['productId'],
+            id: item['id']?.toString(), // ID del registro en Postgres (String/UUID)
+            productId: productId,
             addedAt: DateTime.tryParse(item['createdAt'] ?? '') ?? DateTime.now(),
             product: product, // Guardamos el producto anidado
           );
@@ -84,7 +86,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
     final rows = await _database.getAllFavorites();
     return rows
         .map((row) => FavoriteEntity(
-              id: row.id,
+              id: row.id.toString(),
               productId: row.productId,
               addedAt: row.addedAt,
             ))
