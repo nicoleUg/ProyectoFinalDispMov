@@ -58,4 +58,88 @@ class MenuRepositoryImpl implements MenuRepository {
       print("Error sincronizando menú: $e");
     }
   }
+
+  // --- [NUEVOS MÉTODOS DE ADMINISTRACIÓN DE MENÚ] ---
+  
+  @override
+  Future<void> createProductWithImage({
+    required String categoryId,
+    required String name,
+    required String description,
+    required double price,
+    required String? localImagePath,
+  }) async {
+    await remoteDataSource.createProductWithImage(
+      categoryId: categoryId,
+      name: name,
+      description: description,
+      price: price,
+      localImagePath: localImagePath,
+    );
+    await syncMenuWithServer(); // Sincronizamos para tener el nuevo id y producto en SQLite
+  }
+
+  @override
+  Future<void> updateProductWithImage({
+    required String productId,
+    required String categoryId,
+    required String name,
+    required String description,
+    required double price,
+    required String? localImagePath,
+    required bool isAvailable,
+  }) async {
+    await remoteDataSource.updateProductWithImage(
+      productId: productId,
+      categoryId: categoryId,
+      name: name,
+      description: description,
+      price: price,
+      localImagePath: localImagePath,
+      isAvailable: isAvailable,
+    );
+    await syncMenuWithServer();
+  }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    await remoteDataSource.deleteProduct(productId);
+    await syncMenuWithServer();
+  }
+
+  @override
+  Future<void> createCategoryWithImage({
+    required String name,
+    required int orderIndex,
+    required String? localImagePath,
+  }) async {
+    await remoteDataSource.createCategoryWithImage(
+      name: name,
+      orderIndex: orderIndex,
+      localImagePath: localImagePath,
+    );
+    await syncMenuWithServer();
+  }
+
+  @override
+  Future<void> updateCategoryWithImage({
+    required String categoryId,
+    required String name,
+    required int orderIndex,
+    required String? localImagePath,
+  }) async {
+    await remoteDataSource.updateCategoryWithImage(
+      categoryId: categoryId,
+      name: name,
+      orderIndex: orderIndex,
+      localImagePath: localImagePath,
+    );
+    await syncMenuWithServer();
+  }
+
+  @override
+  Future<void> deleteCategory(String categoryId) async {
+    await remoteDataSource.deleteCategory(categoryId);
+    await syncMenuWithServer();
+  }
 }
