@@ -52,10 +52,50 @@ class ProductsTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable, OrdersTable, OrderItemsTable]) 
+class ReviewsTable extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get productId => text()();
+  /// Rating: 1–5 stars
+  IntColumn get rating => integer()();
+  TextColumn get comment => text().withDefault(const Constant(''))();
+  TextColumn get userName => text().withDefault(const Constant('Anónimo'))();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable, OrdersTable, OrderItemsTable, ReviewsTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'restauranteX_db'));
 
   @override
-  int get schemaVersion => 3; 
+  int get schemaVersion => 4;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 4) {
+        await m.createTable(reviewsTable);
+      }
+    },
+  );
+
+  // ── Reviews queries ────────────────────────────────────────────────────────
+
+  /// Inserta una nueva reseña.
+  Future<int> insertReview(ReviewsTableCompanion review) =>
+      into(reviewsTable).insert(review);
+
+  /// Trae todas las reseñas de un producto ordenadas por fecha descendente.
+  Future<List<ReviewsTableData>> getReviewsForProduct(String productId) =>
+      (select(reviewsTable)
+            ..where((r) => r.productId.equals(productId))
+            ..orderBy([(r) => OrderingTerm.desc(r.createdAt)]))
+          .get();
+
+  /// Calcula el promedio de estrellas de un producto.
+  Future<double> getAverageRating(String productId) async {
+    final reviews = await getReviewsForProduct(productId);
+    if (reviews.isEmpty) return 0.0;
+    final total = reviews.fold<int>(0, (sum, r) => sum + r.rating);
+    return total / reviews.length;
+  }
 }

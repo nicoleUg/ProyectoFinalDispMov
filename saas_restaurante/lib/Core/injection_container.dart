@@ -38,6 +38,9 @@ import '../../features/cart/data/datasources/cart_local_datasource.dart';
 import '../../features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
 import '../../features/table_scanner/domain/repositories/table_scanner_repository.dart';
 import '../../features/table_scanner/data/repositories/table_scanner_repository_impl.dart';
+import '../../features/reviews/presentation/bloc/reviews_bloc.dart';
+import '../../features/reviews/domain/repositories/reviews_repository.dart';
+import '../../features/reviews/data/repositories/reviews_repository_impl.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -116,4 +119,8 @@ Future<void> init() async {
   // Table Scanner
   sl.registerLazySingleton<TableScannerRepository>(() => TableScannerRepositoryImpl());
   sl.registerFactory(() => TableScannerBloc(sl()));
+
+  // Reviews
+  sl.registerLazySingleton<ReviewsRepository>(() => ReviewsRepositoryImpl(sl()));
+  sl.registerFactory(() => ReviewsBloc(sl()));
 }
