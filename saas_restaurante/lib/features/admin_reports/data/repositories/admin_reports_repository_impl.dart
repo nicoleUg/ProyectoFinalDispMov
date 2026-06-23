@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import '../../../../Core/database/app_database.dart';
 import '../../../../Core/network/api_client.dart';
 import '../../domain/entities/report_data_entity.dart';
@@ -11,16 +12,45 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
 
   @override
   Future<ReportDataEntity> getReportData(String period) async {
-    // 1. Attempt to fetch from backend (optional status reporting)
+    // 1. Intentar sincronizar pedidos desde el backend remoto para asegurar datos reales
     try {
-      final response = await apiClient.dio.get('/reports/summary', queryParameters: {
-        'period': period,
-      });
-      // In a full implementation, we could parse backend JSON here.
-      // But for this project, we primarily rely on local SQLite transactions to support offline capabilities.
-      print('Sincronización de reportes desde el servidor recibida: ${response.statusCode}');
+      final response = await apiClient.dio.get('/orders');
+      final List<dynamic> data = response.data;
+      print('[AdminReportsRepository] Sincronizando ${data.length} pedidos desde el backend para reportes...');
+
+      for (var json in data) {
+        final orderId = json['id'] as String;
+        final total = (json['total'] as num).toDouble();
+        final status = json['status'] as String;
+        final tableNumber = json['tableNumber'] as int? ?? 0;
+        final createdAt = json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'] as String)
+            : DateTime.now();
+
+        // Guardar o actualizar pedido local
+        await db.into(db.ordersTable).insertOnConflictUpdate(OrdersTableCompanion(
+              id: Value(orderId),
+              total: Value(total),
+              status: Value(status),
+              createdAt: Value(createdAt),
+              isSynced: const Value(true),
+              tableNumber: Value(tableNumber),
+            ));
+
+        // Actualizar items locales para este pedido
+        await (db.delete(db.orderItemsTable)..where((t) => t.orderId.equals(orderId))).go();
+
+        final List<dynamic> itemsJson = json['items'] as List<dynamic>? ?? [];
+        for (var item in itemsJson) {
+          await db.into(db.orderItemsTable).insert(OrderItemsTableCompanion(
+                orderId: Value(orderId),
+                productName: Value(item['name'] as String),
+                quantity: Value(item['qty'] as int),
+              ));
+        }
+      }
     } catch (e) {
-      print('Sincronización remota de reportes omitida ($e). Usando agregación de base de datos local.');
+      print('[AdminReportsRepository] Sincronización remota de reportes omitida ($e). Usando agregación de base de datos local existente.');
     }
 
     // 2. Query all local orders
