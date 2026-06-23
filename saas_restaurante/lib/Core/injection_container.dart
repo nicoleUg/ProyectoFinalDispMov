@@ -35,6 +35,9 @@ import '../../features/cart/domain/usescases/update_cart_quantity_usecase.dart';
 import '../../features/cart/domain/repositories/cart_repository.dart';
 import '../../features/cart/data/repositories/cart_repository_impl.dart';
 import '../../features/cart/data/datasources/cart_local_datasource.dart';
+import '../../features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
+import '../../features/table_scanner/domain/repositories/table_scanner_repository.dart';
+import '../../features/table_scanner/data/repositories/table_scanner_repository_impl.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -109,4 +112,8 @@ Future<void> init() async {
   
   sl.registerLazySingleton<OrdersLocalDataSource>(() => OrdersLocalDataSourceImpl(sl()));
   sl.registerLazySingleton<OrdersRemoteDataSource>(() => OrdersRemoteDataSourceImpl(sl()));
+
+  // Table Scanner
+  sl.registerLazySingleton<TableScannerRepository>(() => TableScannerRepositoryImpl());
+  sl.registerFactory(() => TableScannerBloc(sl()));
 }

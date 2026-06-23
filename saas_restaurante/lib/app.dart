@@ -11,6 +11,7 @@ import 'features/admin_orders/presentation/bloc/admin_orders_bloc.dart';
 import 'features/admin_orders/presentation/bloc/admin_orders_event.dart';
 import 'features/admin_reports/presentation/bloc/admin_reports_bloc.dart';
 import 'features/admin_reports/presentation/bloc/admin_reports_event.dart';
+import 'features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<AdminReportsBloc>(
           create: (context) => di.sl<AdminReportsBloc>()..add(const LoadReportDataRequested(period: 'today')),
+        ),
+        BlocProvider<TableScannerBloc>(
+          create: (context) => di.sl<TableScannerBloc>(),
         ),
       ],
       child: MaterialApp.router(

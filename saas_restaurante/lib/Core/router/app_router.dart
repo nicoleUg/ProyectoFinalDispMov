@@ -15,6 +15,7 @@ import '../../../features/admin_orders/presentation/pages/pedidos_app_admin.dart
 import '../../../features/admin_reports/presentation/pages/dashboard_app_admin.dart';
 import '../../../features/admin_reports/presentation/pages/reporte_de_ventas_app_admin.dart';
 import '../../../features/deeplinking/presentation/pages/table_handler_page.dart';
+import '../../../features/table_scanner/presentation/pages/qr_scanner_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -87,6 +88,11 @@ class AppRouter {
           final orderId = state.pathParameters['orderId'];
           return OrderTrackingPage(orderId: orderId);
         },
+      ),
+      // ─── Table Scanner Route ─────────────────────────────────────────────
+      GoRoute(
+        path: '/scanner',
+        builder: (context, state) => const QrScannerPage(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
