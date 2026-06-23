@@ -10,6 +10,9 @@ import '../../../cart/domain/entities/cart_item_entity.dart';
 import '../../../deeplinking/presentation/widgets/deeplink_simulator_dialog.dart';
 import '../../../../Core/injection_container.dart' as di;
 import '../../../../Core/secure_storage/secure_storage_service.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
+import '../../../favorites/presentation/bloc/favorites_event.dart';
+import '../../../favorites/presentation/bloc/favorites_state.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -185,6 +188,7 @@ class _MenuPageState extends State<MenuPage> {
                         elevation: 0,
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(16),
+                          onTap: () => context.go('/product/${product.id}'),
                           title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           subtitle: Padding(
                             padding: const EdgeInsets.only(top: 8.0),
@@ -200,29 +204,61 @@ class _MenuPageState extends State<MenuPage> {
                               ],
                             ),
                           ),
-                          trailing: Container(
-                            decoration: BoxDecoration(
-                              color: primaryColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.add, color: primaryColor),
-                              onPressed: () {
-                                // Lógica para agregar al carrito local con Drift/CartCubit
-                                context.read<CartCubit>().addItem(CartItemEntity(
-                                  productId: product.id,
-                                  name: product.name,
-                                  price: product.price,
-                                  quantity: 1,
-                                ));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} agregado al carrito'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                            ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              BlocBuilder<FavoritesBloc, FavoritesState>(
+                                builder: (context, state) {
+                                  bool isFav = false;
+                                  if (state is FavoritesLoaded) {
+                                    isFav = state.favorites.any((f) => f.productId == product.id);
+                                  }
+                                  return IconButton(
+                                    icon: Icon(
+                                      isFav ? Icons.favorite : Icons.favorite_border,
+                                      color: isFav ? Colors.red : Colors.grey.shade600,
+                                    ),
+                                    onPressed: () {
+                                      context.read<FavoritesBloc>().add(ToggleFavoriteRequested(product.id));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            isFav
+                                                ? 'Quitado de favoritos'
+                                                : 'Agregado a favoritos',
+                                          ),
+                                          duration: const Duration(milliseconds: 700),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: IconButton(
+                                  icon: Icon(Icons.add, color: primaryColor),
+                                  onPressed: () {
+                                    context.read<CartCubit>().addItem(CartItemEntity(
+                                      productId: product.id,
+                                      name: product.name,
+                                      price: product.price,
+                                      quantity: 1,
+                                    ));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${product.name} agregado al carrito'),
+                                        duration: const Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );

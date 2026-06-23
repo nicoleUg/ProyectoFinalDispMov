@@ -12,6 +12,9 @@ import '../../../../Core/injection_container.dart' as di;
 import '../../../reviews/presentation/bloc/reviews_bloc.dart';
 import '../../../reviews/presentation/widgets/rating_dialog.dart';
 import '../../../reviews/domain/entities/review_entity.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
+import '../../../favorites/presentation/bloc/favorites_event.dart';
+import '../../../favorites/presentation/bloc/favorites_state.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -158,6 +161,43 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             ),
             onPressed: () => context.go('/'),
           ),
+          actions: [
+            BlocBuilder<FavoritesBloc, FavoritesState>(
+              builder: (context, state) {
+                bool isFav = false;
+                if (state is FavoritesLoaded) {
+                  isFav = state.favorites.any((f) => f.productId == product.id);
+                }
+                return IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.35),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFav ? Icons.favorite : Icons.favorite_border,
+                      size: 20,
+                      color: isFav ? Colors.red : Colors.white,
+                    ),
+                  ),
+                  onPressed: () {
+                    context.read<FavoritesBloc>().add(ToggleFavoriteRequested(product.id));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isFav
+                              ? 'Quitado de favoritos'
+                              : 'Agregado a favoritos',
+                        ),
+                        duration: const Duration(milliseconds: 700),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
           flexibleSpace: FlexibleSpaceBar(
             background: hasImage
                 ? Stack(
