@@ -19,6 +19,11 @@ import '../../features/orders/data/datasources/orders_local_datasource.dart';
 import '../../features/orders/data/datasources/orders_remote_datasource.dart';
 import '../../features/orders/data/repositories/orders_repository_impl.dart';
 import '../../features/orders/presentation/bloc/orders_bloc.dart';
+import '../../features/admin_orders/presentation/bloc/admin_orders_bloc.dart';
+import '../../features/admin_orders/domain/repositories/admin_orders_repository.dart';
+import '../../features/admin_orders/data/repositories/admin_orders_repository_impl.dart';
+import '../../features/admin_orders/domain/usecases/get_admin_orders_usecase.dart';
+import '../../features/admin_orders/domain/usecases/update_order_status_usecase.dart';
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/domain/usescases/add_to_cart_usecase.dart';
 import '../../features/cart/domain/usescases/get_cart_items_usecase.dart';
@@ -60,6 +65,16 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetProductsByCategoryUseCase(sl()));
   sl.registerLazySingleton(() => CreateCategoryUseCase(sl()));
   sl.registerLazySingleton(() => CreateProductUseCase(sl()));
+
+  sl.registerFactory(() => AdminOrdersBloc(
+        getAdminOrdersUseCase: sl(),
+        updateOrderStatusUseCase: sl(),
+      ));
+
+  // Admin Orders
+  sl.registerLazySingleton<AdminOrdersRepository>(() => AdminOrdersRepositoryImpl(db: sl()));
+  sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateOrderStatusUseCase(sl()));
 
   sl.registerLazySingleton(() => MenuRepository(sl()));
   sl.registerFactory(() => CartCubit(

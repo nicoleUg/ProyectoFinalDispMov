@@ -7,6 +7,8 @@ import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/cart/presentation/cubit/cart_cubit.dart';
 import 'features/menu/presentation/blocs/menu_bloc.dart';
 import 'features/admin_menu/presentation/bloc/admin_menu_bloc.dart';
+import 'features/admin_orders/presentation/bloc/admin_orders_bloc.dart';
+import 'features/admin_orders/presentation/bloc/admin_orders_event.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -26,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<AdminMenuBloc>(
           create: (context) => di.sl<AdminMenuBloc>(),
+        ),
+        BlocProvider<AdminOrdersBloc>(
+          create: (context) => di.sl<AdminOrdersBloc>()..add(LoadAdminOrdersRequested()),
         ),
       ],
       child: MaterialApp.router(
