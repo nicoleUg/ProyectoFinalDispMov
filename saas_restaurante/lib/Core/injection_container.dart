@@ -24,6 +24,10 @@ import '../../features/admin_orders/domain/repositories/admin_orders_repository.
 import '../../features/admin_orders/data/repositories/admin_orders_repository_impl.dart';
 import '../../features/admin_orders/domain/usecases/get_admin_orders_usecase.dart';
 import '../../features/admin_orders/domain/usecases/update_order_status_usecase.dart';
+import '../../features/admin_reports/presentation/bloc/admin_reports_bloc.dart';
+import '../../features/admin_reports/domain/repositories/admin_reports_repository.dart';
+import '../../features/admin_reports/data/repositories/admin_reports_repository_impl.dart';
+import '../../features/admin_reports/domain/usecases/get_report_data_usecase.dart';
 import '../../features/cart/presentation/cubit/cart_cubit.dart';
 import '../../features/cart/domain/usescases/add_to_cart_usecase.dart';
 import '../../features/cart/domain/usescases/get_cart_items_usecase.dart';
@@ -75,6 +79,14 @@ Future<void> init() async {
   sl.registerLazySingleton<AdminOrdersRepository>(() => AdminOrdersRepositoryImpl(db: sl(), apiClient: sl()));
   sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
   sl.registerLazySingleton(() => UpdateOrderStatusUseCase(sl()));
+
+  sl.registerFactory(() => AdminReportsBloc(
+        getReportDataUseCase: sl(),
+      ));
+
+  // Admin Reports
+  sl.registerLazySingleton<AdminReportsRepository>(() => AdminReportsRepositoryImpl(db: sl(), apiClient: sl()));
+  sl.registerLazySingleton(() => GetReportDataUseCase(sl()));
 
   sl.registerLazySingleton(() => MenuRepository(sl()));
   sl.registerFactory(() => CartCubit(
