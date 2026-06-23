@@ -10,6 +10,7 @@ import '../../../features/admin_menu/presentation/pages/gesti_n_de_men_app_admin
 import '../../../features/admin_menu/presentation/pages/nuevo_producto_app_admin.dart';
 import '../../../features/admin_menu/presentation/pages/editar_producto_app_admin.dart';
 import '../../../features/menu/domain/entities/product_entity.dart';
+import '../../../features/admin_orders/presentation/pages/pedidos_app_admin.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -48,6 +49,10 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/admin-orders',
+        builder: (context, state) => const PedidosAppAdmin(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

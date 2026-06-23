@@ -196,7 +196,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
           const SizedBox(height: 16),
           _buildDrawerItem(Icons.dashboard_outlined, 'Dashboard', false, () => context.go('/')),
           _buildDrawerItem(Icons.restaurant_menu, 'Menu Editor', true, () {}),
-          _buildDrawerItem(Icons.receipt_long_outlined, 'Orders', false, () => context.go('/orders')),
+          _buildDrawerItem(Icons.receipt_long, 'Kitchen Board', false, () => context.go('/admin-orders')),
           _buildDrawerItem(Icons.settings_outlined, 'Settings', false, () {}),
           const Spacer(),
           Padding(
@@ -529,7 +529,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
         currentIndex: 1,
         onTap: (index) {
           if (index == 0) context.go('/');
-          if (index == 2) context.go('/orders');
+          if (index == 2) context.go('/admin-orders');
         },
         selectedItemColor: RSColors.primary,
         unselectedItemColor: RSColors.textOnSurfaceVariant,
@@ -548,8 +548,8 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
             label: 'Menu',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long),
+            icon: Icon(Icons.receipt_long),
+            activeIcon: Icon(Icons.receipt_long_outlined),
             label: 'Orders',
           ),
         ],
