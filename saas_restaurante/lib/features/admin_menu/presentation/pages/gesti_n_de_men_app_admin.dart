@@ -23,7 +23,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
   @override
   void initState() {
     super.initState();
-    context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+    context.read<AdminMenuBloc>().add(const LoadAdminMenuRequested());
   }
 
   @override
@@ -56,7 +56,8 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+                        // Recargar manteniendo la categoría seleccionada
+                        context.read<AdminMenuBloc>().add(LoadAdminMenuRequested(selectedCategoryId: _selectedCategoryId));
                       }
                       if (state is AdminMenuError) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -66,10 +67,15 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                           ),
                         );
                       }
+                      // [ACTUALIZADO] Sincronizar el estado local de UI con la categoría del Bloc
                       if (state is AdminMenuLoaded) {
-                        if (_selectedCategoryId == null && state.categories.isNotEmpty) {
+                        if (_selectedCategoryId != state.selectedCategoryId && state.selectedCategoryId != null) {
                           setState(() {
-                            _selectedCategoryId = state.selectedCategoryId ?? state.categories.first.id;
+                            _selectedCategoryId = state.selectedCategoryId;
+                          });
+                        } else if (_selectedCategoryId == null && state.categories.isNotEmpty) {
+                           setState(() {
+                            _selectedCategoryId = state.categories.first.id;
                           });
                         }
                       }
@@ -97,7 +103,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                             RSButton.filled(
                               label: 'Reintentar',
                               onPressed: () {
-                                context.read<AdminMenuBloc>().add(LoadAdminMenuRequested());
+                                context.read<AdminMenuBloc>().add(const LoadAdminMenuRequested());
                               },
                             ),
                           ],
@@ -202,11 +208,10 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
             child: RSChoiceChip(
               label: cat.name,
               selected: isSelected,
+              // [ACTUALIZADO] Despacha el evento al BLoC en lugar de solo cambiar el estado local
               onSelected: (selected) {
-                if (selected) {
-                  setState(() {
-                    _selectedCategoryId = cat.id;
-                  });
+                if (selected && _selectedCategoryId != cat.id) {
+                  context.read<AdminMenuBloc>().add(AdminCategorySelected(cat.id));
                 }
               },
             ),
@@ -306,6 +311,8 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                                   duration: const Duration(seconds: 1),
                                 ),
                               );
+                              // Aquí podrías agregar la lógica para disparar el evento UpdateProductRequested
+                              // si quieres que se guarde al instante la disponibilidad
                             },
                             activeColor: RSColors.primary,
                           ),

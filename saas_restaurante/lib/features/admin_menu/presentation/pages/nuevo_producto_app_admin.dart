@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +6,7 @@ import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart
 import '../bloc/admin_menu_bloc.dart';
 import '../bloc/admin_menu_event.dart';
 import '../bloc/admin_menu_state.dart';
+import '../../../../Core/utils/image_provider_helper.dart';
 
 class NuevoProductoAppAdmin extends StatefulWidget {
   const NuevoProductoAppAdmin({super.key});
@@ -48,7 +47,7 @@ class _NuevoProductoAppAdminState extends State<NuevoProductoAppAdmin> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al seleccionar imagen: \$e'),
+          content: Text('Error al seleccionar imagen: $e'),
           backgroundColor: RSColors.error,
         ),
       );
@@ -164,9 +163,7 @@ class _NuevoProductoAppAdminState extends State<NuevoProductoAppAdmin> {
                                   ),
                                   image: _localImagePath != null
                                       ? DecorationImage(
-                                          image: kIsWeb
-                                              ? NetworkImage(_localImagePath!)
-                                              : FileImage(File(_localImagePath!)) as ImageProvider,
+                                          image: getWebSafeImageProvider(_localImagePath!),
                                           fit: BoxFit.cover,
                                         )
                                       : null,

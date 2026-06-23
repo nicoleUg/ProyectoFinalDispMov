@@ -68,9 +68,16 @@ class FavoritesPage extends StatelessWidget {
               List<ProductEntity> favProducts = [];
               if (favState is FavoritesLoaded) {
                 for (final fav in favState.favorites) {
-                  final prod = _findProduct(allProducts, fav.productId);
-                  if (prod != null) {
-                    favProducts.add(prod);
+                  // NUEVO: Usar el producto anidado desde el backend si está disponible.
+                  // Esto permite ver favoritos de cualquier categoría sin importar la actual.
+                  if (fav.product != null) {
+                    favProducts.add(fav.product!);
+                  } else {
+                    // FALLBACK: Buscar localmente si la API no trajo el producto anidado (ej. modo offline)
+                    final prod = _findProduct(allProducts, fav.productId);
+                    if (prod != null) {
+                      favProducts.add(prod);
+                    }
                   }
                 }
               }
