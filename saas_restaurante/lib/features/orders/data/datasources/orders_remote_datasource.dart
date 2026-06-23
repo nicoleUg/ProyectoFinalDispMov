@@ -11,14 +11,10 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   @override
   Future<bool> sendOrderToServer(Map<String, dynamic> orderJson) async {
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      return true;
-      
-      /*
       final response = await dio.post('/orders', data: orderJson);
-      return response.statusCode == 201;
-      */
+      return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
+      print('Error al enviar pedido al servidor remoto: $e');
       return false; 
     }
   }

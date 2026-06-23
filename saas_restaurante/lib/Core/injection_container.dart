@@ -3,27 +3,50 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'database/app_database.dart';
 import 'secure_storage/secure_storage_service.dart';
 import 'network/api_client.dart';
-import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/auth/domain/usecases/login_usecase.dart';
-import '../../features/auth/domain/usecases/logout_usecase.dart';
-import '../../features/auth/domain/usecases/check_auth_usecase.dart';
-import '../../features/auth/data/datasource/auth_local_datasource.dart';
-import '../../features/auth/data/datasource/auth_remote_datasource.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/menu/data/datasource/menu_local_datasource.dart';
-import '../../features/menu/data/datasource/menu_remote_datasource.dart';
-import '../../features/menu/data/repositories/menu_repository_impl.dart';
-import '../../features/menu/domain/repositories/menu_repository.dart';
-import '../../features/menu/domain/usecases/get_local_categories_usecase.dart';
-import '../../features/menu/domain/usecases/get_local_products_usecase.dart';
-import '../../features/menu/domain/usecases/sync_menu_usecase.dart';
-import '../../features/menu/presentation/bloc/menu_bloc.dart';
+import '../../features/menu/data/repositories/menu_repository.dart';
+import '../../features/menu/presentation/blocs/menu_bloc.dart';
+import '../../features/admin_menu/presentation/bloc/admin_menu_bloc.dart';
+import '../../features/admin_menu/domain/repositories/admin_menu_repository.dart';
+import '../../features/admin_menu/data/repositories/admin_menu_repository_impl.dart';
+import '../../features/admin_menu/domain/usecases/get_categories_usecase.dart';
+import '../../features/admin_menu/domain/usecases/get_products_by_category_usecase.dart';
+import '../../features/admin_menu/domain/usecases/create_category_usecase.dart';
+import '../../features/admin_menu/domain/usecases/create_product_usecase.dart';
+import '../../features/admin_menu/domain/usecases/update_product_usecase.dart';
+import '../../features/admin_menu/domain/usecases/delete_product_usecase.dart';
 import '../../features/orders/domain/repositories/order_repository.dart';
-import '../../features/orders/data/datasource/orders_local_datasource.dart';
-import '../../features/orders/data/datasource/orders_remote_datasource.dart';
+import '../../features/orders/data/datasources/orders_local_datasource.dart';
+import '../../features/orders/data/datasources/orders_remote_datasource.dart';
 import '../../features/orders/data/repositories/orders_repository_impl.dart';
 import '../../features/orders/presentation/bloc/orders_bloc.dart';
+import '../../features/admin_orders/presentation/bloc/admin_orders_bloc.dart';
+import '../../features/admin_orders/domain/repositories/admin_orders_repository.dart';
+import '../../features/admin_orders/data/repositories/admin_orders_repository_impl.dart';
+import '../../features/admin_orders/domain/usecases/get_admin_orders_usecase.dart';
+import '../../features/admin_orders/domain/usecases/update_order_status_usecase.dart';
+import '../../features/admin_reports/presentation/bloc/admin_reports_bloc.dart';
+import '../../features/admin_reports/domain/repositories/admin_reports_repository.dart';
+import '../../features/admin_reports/data/repositories/admin_reports_repository_impl.dart';
+import '../../features/admin_reports/domain/usecases/get_report_data_usecase.dart';
+import '../../features/cart/presentation/cubit/cart_cubit.dart';
+import '../../features/cart/domain/usescases/add_to_cart_usecase.dart';
+import '../../features/cart/domain/usescases/get_cart_items_usecase.dart';
+import '../../features/cart/domain/usescases/update_cart_quantity_usecase.dart';
+import '../../features/cart/domain/usescases/clear_cart_usecase.dart';
+import '../../features/cart/domain/repositories/cart_repository.dart';
+import '../../features/cart/data/repositories/cart_repository_impl.dart';
+import '../../features/cart/data/datasources/cart_local_datasource.dart';
+import '../../features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
+import '../../features/table_scanner/domain/repositories/table_scanner_repository.dart';
+import '../../features/table_scanner/data/repositories/table_scanner_repository_impl.dart';
+import '../../features/reviews/presentation/bloc/reviews_bloc.dart';
+import '../../features/reviews/domain/repositories/reviews_repository.dart';
+import '../../features/reviews/data/repositories/reviews_repository_impl.dart';
+import '../../features/favorites/domain/repositories/favorites_repository.dart';
+import '../../features/favorites/data/repositories/favorites_repository_impl.dart';
+import '../../features/favorites/presentation/bloc/favorites_bloc.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -36,52 +59,67 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sl<ApiClient>().dio); 
 
   sl.registerFactory(() => AuthBloc(
-        loginUseCase: sl(),
-        logoutUseCase: sl(),
-        checkAuthUseCase: sl(),
+        authRepository: sl(),
       ));
 
-  sl.registerLazySingleton(() => LoginUseCase(sl()));
-  sl.registerLazySingleton(() => LogoutUseCase(sl()));
-  sl.registerLazySingleton(() => CheckAuthUseCase(sl()));
-
-  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(
-        remoteDataSource: sl(),
-        localDataSource: sl(),
-      ));
-
-  sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(sl()));
-  sl.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSourceImpl(sl()));
+  sl.registerLazySingleton(() => AuthRepository(sl(), sl()));
 
   sl.registerFactory(() => MenuBloc(
-        getCategories: sl(),
-        getProducts: sl(),
-        syncMenu: sl(),
+        menuRepository: sl(),
       ));
 
-  sl.registerLazySingleton(() => GetLocalCategoriesUseCase(sl()));
-  sl.registerLazySingleton(() => GetLocalProductsUseCase(sl()));
-  sl.registerLazySingleton(() => SyncMenuUseCase(sl()));
+  sl.registerFactory(() => AdminMenuBloc(
+        getCategoriesUseCase: sl(),
+        getProductsByCategoryUseCase: sl(),
+        createCategoryUseCase: sl(),
+        createProductUseCase: sl(),
+        updateProductUseCase: sl(),
+        deleteProductUseCase: sl(),
+      ));
 
-  sl.registerLazySingleton<MenuRepository>(
-    () => MenuRepositoryImpl(localDataSource: sl(), remoteDataSource: sl())
-  );
+  // Admin Menu
+  sl.registerLazySingleton<AdminMenuRepository>(() => AdminMenuRepositoryImpl(menuRepository: sl()));
+  sl.registerLazySingleton(() => GetCategoriesUseCase(sl()));
+  sl.registerLazySingleton(() => GetProductsByCategoryUseCase(sl()));
+  sl.registerLazySingleton(() => CreateCategoryUseCase(sl()));
+  sl.registerLazySingleton(() => CreateProductUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProductUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProductUseCase(sl()));
 
-  sl.registerLazySingleton<MenuRemoteDataSource>(() => MenuRemoteDataSourceImpl(sl()));
-  sl.registerLazySingleton<MenuLocalDataSource>(() => MenuLocalDataSourceImpl(sl()));
+  sl.registerFactory(() => AdminOrdersBloc(
+        getAdminOrdersUseCase: sl(),
+        updateOrderStatusUseCase: sl(),
+      ));
+
+  // Admin Orders
+  sl.registerLazySingleton<AdminOrdersRepository>(() => AdminOrdersRepositoryImpl(db: sl(), apiClient: sl()));
+  sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateOrderStatusUseCase(sl()));
+
+  sl.registerFactory(() => AdminReportsBloc(
+        getReportDataUseCase: sl(),
+      ));
+
+  // Admin Reports
+  sl.registerLazySingleton<AdminReportsRepository>(() => AdminReportsRepositoryImpl(db: sl(), apiClient: sl()));
+  sl.registerLazySingleton(() => GetReportDataUseCase(sl()));
+
+  sl.registerLazySingleton(() => MenuRepository(sl()));
   sl.registerFactory(() => CartCubit(
     addToCartUseCase: sl(),
     getCartItemsUseCase: sl(),
     updateQuantityUseCase: sl(),
+    clearCartUseCase: sl(),
   ));
 
   sl.registerLazySingleton(() => AddToCartUseCase(sl()));
   sl.registerLazySingleton(() => GetCartItemsUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateQuantityUseCase(sl())); 
+  sl.registerLazySingleton(() => UpdateCartQuantityUseCase(sl())); 
+  sl.registerLazySingleton(() => ClearCartUseCase(sl()));
 
   sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
   sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));
-  sl.registerFactory(() => OrdersBloc(sl()));
+  sl.registerFactory(() => OrdersBloc(sl(), sl()));
   
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl())
@@ -89,4 +127,16 @@ Future<void> init() async {
   
   sl.registerLazySingleton<OrdersLocalDataSource>(() => OrdersLocalDataSourceImpl(sl()));
   sl.registerLazySingleton<OrdersRemoteDataSource>(() => OrdersRemoteDataSourceImpl(sl()));
+
+  // Table Scanner
+  sl.registerLazySingleton<TableScannerRepository>(() => TableScannerRepositoryImpl());
+  sl.registerFactory(() => TableScannerBloc(sl()));
+
+  // Reviews
+  sl.registerLazySingleton<ReviewsRepository>(() => ReviewsRepositoryImpl(sl()));
+  sl.registerFactory(() => ReviewsBloc(sl()));
+
+  // Favorites
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
+  sl.registerFactory(() => FavoritesBloc(sl()));
 }

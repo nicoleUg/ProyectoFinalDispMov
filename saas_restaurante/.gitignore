@@ -102,3 +102,7 @@ lerna-debug.log*
 firebase-key.json
 google-services.json
 GoogleService-Info.plist
+
+# Design System Mockups
+/stitch_restaurant_saas_management_suite/
+

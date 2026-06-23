@@ -4,6 +4,18 @@ import 'Core/injection_container.dart' as di;
 import 'Core/router/app_router.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/cart/presentation/cubit/cart_cubit.dart';
+import 'features/menu/presentation/blocs/menu_bloc.dart';
+import 'features/admin_menu/presentation/bloc/admin_menu_bloc.dart';
+import 'features/admin_orders/presentation/bloc/admin_orders_bloc.dart';
+import 'features/admin_orders/presentation/bloc/admin_orders_event.dart';
+import 'features/admin_reports/presentation/bloc/admin_reports_bloc.dart';
+import 'features/admin_reports/presentation/bloc/admin_reports_event.dart';
+import 'features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
+import 'features/favorites/presentation/bloc/favorites_bloc.dart';
+import 'features/favorites/presentation/bloc/favorites_event.dart';
+import 'features/orders/presentation/bloc/orders_bloc.dart';
+import 'features/orders/presentation/bloc/orders_event.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -18,9 +30,30 @@ class MyApp extends StatelessWidget {
         BlocProvider<CartCubit>(
           create: (context) => di.sl<CartCubit>()..loadCart(),
         ),
+        BlocProvider<MenuBloc>(
+          create: (context) => di.sl<MenuBloc>(),
+        ),
+        BlocProvider<AdminMenuBloc>(
+          create: (context) => di.sl<AdminMenuBloc>(),
+        ),
+        BlocProvider<AdminOrdersBloc>(
+          create: (context) => di.sl<AdminOrdersBloc>()..add(LoadAdminOrdersRequested()),
+        ),
+        BlocProvider<AdminReportsBloc>(
+          create: (context) => di.sl<AdminReportsBloc>()..add(const LoadReportDataRequested(period: 'today')),
+        ),
+        BlocProvider<TableScannerBloc>(
+          create: (context) => di.sl<TableScannerBloc>(),
+        ),
+        BlocProvider<FavoritesBloc>(
+          create: (context) => di.sl<FavoritesBloc>()..add(LoadFavoritesRequested()),
+        ),
+        BlocProvider<OrdersBloc>(
+          create: (context) => di.sl<OrdersBloc>()..add(LoadMyOrdersRequested()),
+        ),
       ],
       child: MaterialApp.router(
-        title: 'Restaurante X',
+        title: 'Restaurante SaaS',
         debugShowCheckedModeBanner: false,
         routerConfig: AppRouter.router,
         theme: ThemeData(

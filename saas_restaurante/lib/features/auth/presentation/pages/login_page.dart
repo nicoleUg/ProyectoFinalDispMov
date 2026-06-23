@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -45,8 +46,11 @@ class _LoginPageState extends State<LoginPage> {
             );
           }
           if (state is AuthAuthenticated) {
-            
-            // o go router Navigator.of(context).pushReplacementNamed('/menu');
+            if (state.user?.role == 'admin') {
+              context.go('/admin-dashboard');
+            } else {
+              context.go('/');
+            }
           }
         },
         builder: (context, state) {
@@ -69,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Restaurante X',
+                      'Restaurante SaaS',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -170,6 +174,17 @@ class _LoginPageState extends State<LoginPage> {
                                   style: const TextStyle(fontSize: 16),
                                 ),
                               ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("Don't have an account?", style: TextStyle(color: Colors.grey)),
+                                TextButton(
+                                  onPressed: () => context.go('/register'),
+                                  child: Text('Sign Up', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
                             ),
                           ],
                         ),

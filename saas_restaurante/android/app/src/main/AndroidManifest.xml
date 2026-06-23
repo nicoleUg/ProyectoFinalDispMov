@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permiso de cámara requerido por table_scanner (mobile_scanner + permission_handler) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Vibración para retroalimentación háptica al escanear QR exitosamente -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Requerido por mobile_scanner para acceso a la cámara en Android 9+ -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:label="saas_restaurante"
         android:name="${applicationName}"

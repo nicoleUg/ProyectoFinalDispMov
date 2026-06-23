@@ -1,20 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'menu_event.dart';
 import 'menu_state.dart';
-import '../../domain/usecases/get_local_categories_usecase.dart';
-import '../../domain/usecases/get_local_products_usecase.dart';
-import '../../domain/usecases/sync_menu_usecase.dart';
+import '../../data/repositories/menu_repository.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
-  final GetLocalCategoriesUseCase getCategories;
-  final GetLocalProductsUseCase getProducts;
-  final SyncMenuUseCase syncMenu;
+  final MenuRepository menuRepository;
 
   MenuBloc({
-    required this.getCategories,
-    required this.getProducts,
-    required this.syncMenu,
-  }) : super(MenuLoading()) {
+    required this.menuRepository,
+  }) : super(MenuInitial()) {
     on<LoadMenuRequested>(_onLoadMenuRequested);
     on<CategorySelected>(_onCategorySelected);
   }
@@ -23,18 +17,19 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     emit(MenuLoading());
 
     try {
-      syncMenu.call().then((_) {
-      });
-
-      final categories = await getCategories.call();
+      final categories = await menuRepository.getCategories();
       
       if (categories.isEmpty) {
-        emit(const MenuError('El menú no está disponible en este momento.'));
+        emit(const MenuLoaded(
+          categories: [],
+          products: [],
+          selectedCategoryId: '',
+        ));
         return;
       }
 
       final firstCategoryId = categories.first.id;
-      final products = await getProducts.call(firstCategoryId);
+      final products = await menuRepository.getProductsByCategory(firstCategoryId);
 
       emit(MenuLoaded(
         categories: categories,
@@ -42,19 +37,24 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         selectedCategoryId: firstCategoryId,
       ));
     } catch (e) {
-      emit(MenuError(e.toString()));
+      emit(const MenuError('No se pudo cargar el menú'));
     }
   }
 
   Future<void> _onCategorySelected(CategorySelected event, Emitter<MenuState> emit) async {
     final currentState = state;
     if (currentState is MenuLoaded) {
-      final products = await getProducts.call(event.categoryId);
-      emit(MenuLoaded(
-        categories: currentState.categories,
-        products: products,
-        selectedCategoryId: event.categoryId,
-      ));
+      emit(MenuLoading());
+      try {
+        final products = await menuRepository.getProductsByCategory(event.categoryId);
+        emit(MenuLoaded(
+          categories: currentState.categories,
+          products: products,
+          selectedCategoryId: event.categoryId,
+        ));
+      } catch (e) {
+        emit(const MenuError('No se pudieron cargar los productos'));
+      }
     }
   }
 }

@@ -5,10 +5,16 @@ class OrderEntity {
   final DateTime createdAt;
   final List<OrderItemEntity> items;
   final bool isSynced;
+  final int tableNumber;
 
   OrderEntity({
-    required this.id, required this.total, required this.status, 
-    required this.createdAt, required this.items, this.isSynced = false
+    required this.id,
+    required this.total,
+    required this.status, 
+    required this.createdAt,
+    required this.items,
+    this.isSynced = false,
+    this.tableNumber = 0,
   });
 }
 

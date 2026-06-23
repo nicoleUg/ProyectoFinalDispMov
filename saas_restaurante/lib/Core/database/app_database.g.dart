@@ -1148,6 +1148,1377 @@ class ProductsTableCompanion extends UpdateCompanion<ProductsTableData> {
   }
 }
 
+class $OrdersTableTable extends OrdersTable
+    with TableInfo<$OrdersTableTable, OrdersTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OrdersTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _totalMeta = const VerificationMeta('total');
+  @override
+  late final GeneratedColumn<double> total = GeneratedColumn<double>(
+    'total',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isSyncedMeta = const VerificationMeta(
+    'isSynced',
+  );
+  @override
+  late final GeneratedColumn<bool> isSynced = GeneratedColumn<bool>(
+    'is_synced',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_synced" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _tableNumberMeta = const VerificationMeta(
+    'tableNumber',
+  );
+  @override
+  late final GeneratedColumn<int> tableNumber = GeneratedColumn<int>(
+    'table_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    total,
+    status,
+    createdAt,
+    isSynced,
+    tableNumber,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'orders_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OrdersTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('total')) {
+      context.handle(
+        _totalMeta,
+        total.isAcceptableOrUnknown(data['total']!, _totalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_totalMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('is_synced')) {
+      context.handle(
+        _isSyncedMeta,
+        isSynced.isAcceptableOrUnknown(data['is_synced']!, _isSyncedMeta),
+      );
+    }
+    if (data.containsKey('table_number')) {
+      context.handle(
+        _tableNumberMeta,
+        tableNumber.isAcceptableOrUnknown(
+          data['table_number']!,
+          _tableNumberMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OrdersTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OrdersTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      total: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      isSynced: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_synced'],
+      )!,
+      tableNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}table_number'],
+      )!,
+    );
+  }
+
+  @override
+  $OrdersTableTable createAlias(String alias) {
+    return $OrdersTableTable(attachedDatabase, alias);
+  }
+}
+
+class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
+  final String id;
+  final double total;
+  final String status;
+  final DateTime createdAt;
+  final bool isSynced;
+  final int tableNumber;
+  const OrdersTableData({
+    required this.id,
+    required this.total,
+    required this.status,
+    required this.createdAt,
+    required this.isSynced,
+    required this.tableNumber,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['total'] = Variable<double>(total);
+    map['status'] = Variable<String>(status);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['is_synced'] = Variable<bool>(isSynced);
+    map['table_number'] = Variable<int>(tableNumber);
+    return map;
+  }
+
+  OrdersTableCompanion toCompanion(bool nullToAbsent) {
+    return OrdersTableCompanion(
+      id: Value(id),
+      total: Value(total),
+      status: Value(status),
+      createdAt: Value(createdAt),
+      isSynced: Value(isSynced),
+      tableNumber: Value(tableNumber),
+    );
+  }
+
+  factory OrdersTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OrdersTableData(
+      id: serializer.fromJson<String>(json['id']),
+      total: serializer.fromJson<double>(json['total']),
+      status: serializer.fromJson<String>(json['status']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      isSynced: serializer.fromJson<bool>(json['isSynced']),
+      tableNumber: serializer.fromJson<int>(json['tableNumber']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'total': serializer.toJson<double>(total),
+      'status': serializer.toJson<String>(status),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isSynced': serializer.toJson<bool>(isSynced),
+      'tableNumber': serializer.toJson<int>(tableNumber),
+    };
+  }
+
+  OrdersTableData copyWith({
+    String? id,
+    double? total,
+    String? status,
+    DateTime? createdAt,
+    bool? isSynced,
+    int? tableNumber,
+  }) => OrdersTableData(
+    id: id ?? this.id,
+    total: total ?? this.total,
+    status: status ?? this.status,
+    createdAt: createdAt ?? this.createdAt,
+    isSynced: isSynced ?? this.isSynced,
+    tableNumber: tableNumber ?? this.tableNumber,
+  );
+  OrdersTableData copyWithCompanion(OrdersTableCompanion data) {
+    return OrdersTableData(
+      id: data.id.present ? data.id.value : this.id,
+      total: data.total.present ? data.total.value : this.total,
+      status: data.status.present ? data.status.value : this.status,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
+      tableNumber: data.tableNumber.present
+          ? data.tableNumber.value
+          : this.tableNumber,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrdersTableData(')
+          ..write('id: $id, ')
+          ..write('total: $total, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('tableNumber: $tableNumber')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, total, status, createdAt, isSynced, tableNumber);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OrdersTableData &&
+          other.id == this.id &&
+          other.total == this.total &&
+          other.status == this.status &&
+          other.createdAt == this.createdAt &&
+          other.isSynced == this.isSynced &&
+          other.tableNumber == this.tableNumber);
+}
+
+class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
+  final Value<String> id;
+  final Value<double> total;
+  final Value<String> status;
+  final Value<DateTime> createdAt;
+  final Value<bool> isSynced;
+  final Value<int> tableNumber;
+  final Value<int> rowid;
+  const OrdersTableCompanion({
+    this.id = const Value.absent(),
+    this.total = const Value.absent(),
+    this.status = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.isSynced = const Value.absent(),
+    this.tableNumber = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  OrdersTableCompanion.insert({
+    required String id,
+    required double total,
+    required String status,
+    required DateTime createdAt,
+    this.isSynced = const Value.absent(),
+    this.tableNumber = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       total = Value(total),
+       status = Value(status),
+       createdAt = Value(createdAt);
+  static Insertable<OrdersTableData> custom({
+    Expression<String>? id,
+    Expression<double>? total,
+    Expression<String>? status,
+    Expression<DateTime>? createdAt,
+    Expression<bool>? isSynced,
+    Expression<int>? tableNumber,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (total != null) 'total': total,
+      if (status != null) 'status': status,
+      if (createdAt != null) 'created_at': createdAt,
+      if (isSynced != null) 'is_synced': isSynced,
+      if (tableNumber != null) 'table_number': tableNumber,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  OrdersTableCompanion copyWith({
+    Value<String>? id,
+    Value<double>? total,
+    Value<String>? status,
+    Value<DateTime>? createdAt,
+    Value<bool>? isSynced,
+    Value<int>? tableNumber,
+    Value<int>? rowid,
+  }) {
+    return OrdersTableCompanion(
+      id: id ?? this.id,
+      total: total ?? this.total,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      isSynced: isSynced ?? this.isSynced,
+      tableNumber: tableNumber ?? this.tableNumber,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (total.present) {
+      map['total'] = Variable<double>(total.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (isSynced.present) {
+      map['is_synced'] = Variable<bool>(isSynced.value);
+    }
+    if (tableNumber.present) {
+      map['table_number'] = Variable<int>(tableNumber.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrdersTableCompanion(')
+          ..write('id: $id, ')
+          ..write('total: $total, ')
+          ..write('status: $status, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('isSynced: $isSynced, ')
+          ..write('tableNumber: $tableNumber, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $OrderItemsTableTable extends OrderItemsTable
+    with TableInfo<$OrderItemsTableTable, OrderItemsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $OrderItemsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _orderIdMeta = const VerificationMeta(
+    'orderId',
+  );
+  @override
+  late final GeneratedColumn<String> orderId = GeneratedColumn<String>(
+    'order_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES orders_table (id)',
+    ),
+  );
+  static const VerificationMeta _productNameMeta = const VerificationMeta(
+    'productName',
+  );
+  @override
+  late final GeneratedColumn<String> productName = GeneratedColumn<String>(
+    'product_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, orderId, productName, quantity];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'order_items_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<OrderItemsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('order_id')) {
+      context.handle(
+        _orderIdMeta,
+        orderId.isAcceptableOrUnknown(data['order_id']!, _orderIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_orderIdMeta);
+    }
+    if (data.containsKey('product_name')) {
+      context.handle(
+        _productNameMeta,
+        productName.isAcceptableOrUnknown(
+          data['product_name']!,
+          _productNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_productNameMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  OrderItemsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return OrderItemsTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      orderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}order_id'],
+      )!,
+      productName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_name'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+    );
+  }
+
+  @override
+  $OrderItemsTableTable createAlias(String alias) {
+    return $OrderItemsTableTable(attachedDatabase, alias);
+  }
+}
+
+class OrderItemsTableData extends DataClass
+    implements Insertable<OrderItemsTableData> {
+  final int id;
+  final String orderId;
+  final String productName;
+  final int quantity;
+  const OrderItemsTableData({
+    required this.id,
+    required this.orderId,
+    required this.productName,
+    required this.quantity,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['order_id'] = Variable<String>(orderId);
+    map['product_name'] = Variable<String>(productName);
+    map['quantity'] = Variable<int>(quantity);
+    return map;
+  }
+
+  OrderItemsTableCompanion toCompanion(bool nullToAbsent) {
+    return OrderItemsTableCompanion(
+      id: Value(id),
+      orderId: Value(orderId),
+      productName: Value(productName),
+      quantity: Value(quantity),
+    );
+  }
+
+  factory OrderItemsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return OrderItemsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      orderId: serializer.fromJson<String>(json['orderId']),
+      productName: serializer.fromJson<String>(json['productName']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'orderId': serializer.toJson<String>(orderId),
+      'productName': serializer.toJson<String>(productName),
+      'quantity': serializer.toJson<int>(quantity),
+    };
+  }
+
+  OrderItemsTableData copyWith({
+    int? id,
+    String? orderId,
+    String? productName,
+    int? quantity,
+  }) => OrderItemsTableData(
+    id: id ?? this.id,
+    orderId: orderId ?? this.orderId,
+    productName: productName ?? this.productName,
+    quantity: quantity ?? this.quantity,
+  );
+  OrderItemsTableData copyWithCompanion(OrderItemsTableCompanion data) {
+    return OrderItemsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      orderId: data.orderId.present ? data.orderId.value : this.orderId,
+      productName: data.productName.present
+          ? data.productName.value
+          : this.productName,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrderItemsTableData(')
+          ..write('id: $id, ')
+          ..write('orderId: $orderId, ')
+          ..write('productName: $productName, ')
+          ..write('quantity: $quantity')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, orderId, productName, quantity);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is OrderItemsTableData &&
+          other.id == this.id &&
+          other.orderId == this.orderId &&
+          other.productName == this.productName &&
+          other.quantity == this.quantity);
+}
+
+class OrderItemsTableCompanion extends UpdateCompanion<OrderItemsTableData> {
+  final Value<int> id;
+  final Value<String> orderId;
+  final Value<String> productName;
+  final Value<int> quantity;
+  const OrderItemsTableCompanion({
+    this.id = const Value.absent(),
+    this.orderId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.quantity = const Value.absent(),
+  });
+  OrderItemsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String orderId,
+    required String productName,
+    required int quantity,
+  }) : orderId = Value(orderId),
+       productName = Value(productName),
+       quantity = Value(quantity);
+  static Insertable<OrderItemsTableData> custom({
+    Expression<int>? id,
+    Expression<String>? orderId,
+    Expression<String>? productName,
+    Expression<int>? quantity,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (orderId != null) 'order_id': orderId,
+      if (productName != null) 'product_name': productName,
+      if (quantity != null) 'quantity': quantity,
+    });
+  }
+
+  OrderItemsTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? orderId,
+    Value<String>? productName,
+    Value<int>? quantity,
+  }) {
+    return OrderItemsTableCompanion(
+      id: id ?? this.id,
+      orderId: orderId ?? this.orderId,
+      productName: productName ?? this.productName,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (orderId.present) {
+      map['order_id'] = Variable<String>(orderId.value);
+    }
+    if (productName.present) {
+      map['product_name'] = Variable<String>(productName.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('OrderItemsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('orderId: $orderId, ')
+          ..write('productName: $productName, ')
+          ..write('quantity: $quantity')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ReviewsTableTable extends ReviewsTable
+    with TableInfo<$ReviewsTableTable, ReviewsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ReviewsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ratingMeta = const VerificationMeta('rating');
+  @override
+  late final GeneratedColumn<int> rating = GeneratedColumn<int>(
+    'rating',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _commentMeta = const VerificationMeta(
+    'comment',
+  );
+  @override
+  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
+    'comment',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _userNameMeta = const VerificationMeta(
+    'userName',
+  );
+  @override
+  late final GeneratedColumn<String> userName = GeneratedColumn<String>(
+    'user_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('Anónimo'),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    productId,
+    rating,
+    comment,
+    userName,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reviews_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ReviewsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('rating')) {
+      context.handle(
+        _ratingMeta,
+        rating.isAcceptableOrUnknown(data['rating']!, _ratingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ratingMeta);
+    }
+    if (data.containsKey('comment')) {
+      context.handle(
+        _commentMeta,
+        comment.isAcceptableOrUnknown(data['comment']!, _commentMeta),
+      );
+    }
+    if (data.containsKey('user_name')) {
+      context.handle(
+        _userNameMeta,
+        userName.isAcceptableOrUnknown(data['user_name']!, _userNameMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReviewsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReviewsTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_id'],
+      )!,
+      rating: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}rating'],
+      )!,
+      comment: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}comment'],
+      )!,
+      userName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ReviewsTableTable createAlias(String alias) {
+    return $ReviewsTableTable(attachedDatabase, alias);
+  }
+}
+
+class ReviewsTableData extends DataClass
+    implements Insertable<ReviewsTableData> {
+  final int id;
+  final String productId;
+
+  /// Rating: 1–5 stars
+  final int rating;
+  final String comment;
+  final String userName;
+  final DateTime createdAt;
+  const ReviewsTableData({
+    required this.id,
+    required this.productId,
+    required this.rating,
+    required this.comment,
+    required this.userName,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['product_id'] = Variable<String>(productId);
+    map['rating'] = Variable<int>(rating);
+    map['comment'] = Variable<String>(comment);
+    map['user_name'] = Variable<String>(userName);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ReviewsTableCompanion toCompanion(bool nullToAbsent) {
+    return ReviewsTableCompanion(
+      id: Value(id),
+      productId: Value(productId),
+      rating: Value(rating),
+      comment: Value(comment),
+      userName: Value(userName),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ReviewsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReviewsTableData(
+      id: serializer.fromJson<int>(json['id']),
+      productId: serializer.fromJson<String>(json['productId']),
+      rating: serializer.fromJson<int>(json['rating']),
+      comment: serializer.fromJson<String>(json['comment']),
+      userName: serializer.fromJson<String>(json['userName']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'productId': serializer.toJson<String>(productId),
+      'rating': serializer.toJson<int>(rating),
+      'comment': serializer.toJson<String>(comment),
+      'userName': serializer.toJson<String>(userName),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ReviewsTableData copyWith({
+    int? id,
+    String? productId,
+    int? rating,
+    String? comment,
+    String? userName,
+    DateTime? createdAt,
+  }) => ReviewsTableData(
+    id: id ?? this.id,
+    productId: productId ?? this.productId,
+    rating: rating ?? this.rating,
+    comment: comment ?? this.comment,
+    userName: userName ?? this.userName,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  ReviewsTableData copyWithCompanion(ReviewsTableCompanion data) {
+    return ReviewsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      rating: data.rating.present ? data.rating.value : this.rating,
+      comment: data.comment.present ? data.comment.value : this.comment,
+      userName: data.userName.present ? data.userName.value : this.userName,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewsTableData(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('rating: $rating, ')
+          ..write('comment: $comment, ')
+          ..write('userName: $userName, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, productId, rating, comment, userName, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReviewsTableData &&
+          other.id == this.id &&
+          other.productId == this.productId &&
+          other.rating == this.rating &&
+          other.comment == this.comment &&
+          other.userName == this.userName &&
+          other.createdAt == this.createdAt);
+}
+
+class ReviewsTableCompanion extends UpdateCompanion<ReviewsTableData> {
+  final Value<int> id;
+  final Value<String> productId;
+  final Value<int> rating;
+  final Value<String> comment;
+  final Value<String> userName;
+  final Value<DateTime> createdAt;
+  const ReviewsTableCompanion({
+    this.id = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.rating = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.userName = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  ReviewsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String productId,
+    required int rating,
+    this.comment = const Value.absent(),
+    this.userName = const Value.absent(),
+    required DateTime createdAt,
+  }) : productId = Value(productId),
+       rating = Value(rating),
+       createdAt = Value(createdAt);
+  static Insertable<ReviewsTableData> custom({
+    Expression<int>? id,
+    Expression<String>? productId,
+    Expression<int>? rating,
+    Expression<String>? comment,
+    Expression<String>? userName,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (productId != null) 'product_id': productId,
+      if (rating != null) 'rating': rating,
+      if (comment != null) 'comment': comment,
+      if (userName != null) 'user_name': userName,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  ReviewsTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? productId,
+    Value<int>? rating,
+    Value<String>? comment,
+    Value<String>? userName,
+    Value<DateTime>? createdAt,
+  }) {
+    return ReviewsTableCompanion(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      rating: rating ?? this.rating,
+      comment: comment ?? this.comment,
+      userName: userName ?? this.userName,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (rating.present) {
+      map['rating'] = Variable<int>(rating.value);
+    }
+    if (comment.present) {
+      map['comment'] = Variable<String>(comment.value);
+    }
+    if (userName.present) {
+      map['user_name'] = Variable<String>(userName.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReviewsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('rating: $rating, ')
+          ..write('comment: $comment, ')
+          ..write('userName: $userName, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FavoritesTableTable extends FavoritesTable
+    with TableInfo<$FavoritesTableTable, FavoritesTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FavoritesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _addedAtMeta = const VerificationMeta(
+    'addedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> addedAt = GeneratedColumn<DateTime>(
+    'added_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, productId, addedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'favorites_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FavoritesTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('added_at')) {
+      context.handle(
+        _addedAtMeta,
+        addedAt.isAcceptableOrUnknown(data['added_at']!, _addedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_addedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FavoritesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FavoritesTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_id'],
+      )!,
+      addedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}added_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FavoritesTableTable createAlias(String alias) {
+    return $FavoritesTableTable(attachedDatabase, alias);
+  }
+}
+
+class FavoritesTableData extends DataClass
+    implements Insertable<FavoritesTableData> {
+  final int id;
+  final String productId;
+  final DateTime addedAt;
+  const FavoritesTableData({
+    required this.id,
+    required this.productId,
+    required this.addedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['product_id'] = Variable<String>(productId);
+    map['added_at'] = Variable<DateTime>(addedAt);
+    return map;
+  }
+
+  FavoritesTableCompanion toCompanion(bool nullToAbsent) {
+    return FavoritesTableCompanion(
+      id: Value(id),
+      productId: Value(productId),
+      addedAt: Value(addedAt),
+    );
+  }
+
+  factory FavoritesTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FavoritesTableData(
+      id: serializer.fromJson<int>(json['id']),
+      productId: serializer.fromJson<String>(json['productId']),
+      addedAt: serializer.fromJson<DateTime>(json['addedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'productId': serializer.toJson<String>(productId),
+      'addedAt': serializer.toJson<DateTime>(addedAt),
+    };
+  }
+
+  FavoritesTableData copyWith({
+    int? id,
+    String? productId,
+    DateTime? addedAt,
+  }) => FavoritesTableData(
+    id: id ?? this.id,
+    productId: productId ?? this.productId,
+    addedAt: addedAt ?? this.addedAt,
+  );
+  FavoritesTableData copyWithCompanion(FavoritesTableCompanion data) {
+    return FavoritesTableData(
+      id: data.id.present ? data.id.value : this.id,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      addedAt: data.addedAt.present ? data.addedAt.value : this.addedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoritesTableData(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('addedAt: $addedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, productId, addedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FavoritesTableData &&
+          other.id == this.id &&
+          other.productId == this.productId &&
+          other.addedAt == this.addedAt);
+}
+
+class FavoritesTableCompanion extends UpdateCompanion<FavoritesTableData> {
+  final Value<int> id;
+  final Value<String> productId;
+  final Value<DateTime> addedAt;
+  const FavoritesTableCompanion({
+    this.id = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.addedAt = const Value.absent(),
+  });
+  FavoritesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String productId,
+    required DateTime addedAt,
+  }) : productId = Value(productId),
+       addedAt = Value(addedAt);
+  static Insertable<FavoritesTableData> custom({
+    Expression<int>? id,
+    Expression<String>? productId,
+    Expression<DateTime>? addedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (productId != null) 'product_id': productId,
+      if (addedAt != null) 'added_at': addedAt,
+    });
+  }
+
+  FavoritesTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? productId,
+    Value<DateTime>? addedAt,
+  }) {
+    return FavoritesTableCompanion(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      addedAt: addedAt ?? this.addedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (addedAt.present) {
+      map['added_at'] = Variable<DateTime>(addedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FavoritesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('addedAt: $addedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1156,6 +2527,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $ProductsTableTable productsTable = $ProductsTableTable(this);
+  late final $OrdersTableTable ordersTable = $OrdersTableTable(this);
+  late final $OrderItemsTableTable orderItemsTable = $OrderItemsTableTable(
+    this,
+  );
+  late final $ReviewsTableTable reviewsTable = $ReviewsTableTable(this);
+  late final $FavoritesTableTable favoritesTable = $FavoritesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1164,6 +2541,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cartItems,
     categoriesTable,
     productsTable,
+    ordersTable,
+    orderItemsTable,
+    reviewsTable,
+    favoritesTable,
   ];
 }
 
@@ -2019,6 +3400,1014 @@ typedef $$ProductsTableTableProcessedTableManager =
       ProductsTableData,
       PrefetchHooks Function({bool categoryId})
     >;
+typedef $$OrdersTableTableCreateCompanionBuilder =
+    OrdersTableCompanion Function({
+      required String id,
+      required double total,
+      required String status,
+      required DateTime createdAt,
+      Value<bool> isSynced,
+      Value<int> tableNumber,
+      Value<int> rowid,
+    });
+typedef $$OrdersTableTableUpdateCompanionBuilder =
+    OrdersTableCompanion Function({
+      Value<String> id,
+      Value<double> total,
+      Value<String> status,
+      Value<DateTime> createdAt,
+      Value<bool> isSynced,
+      Value<int> tableNumber,
+      Value<int> rowid,
+    });
+
+final class $$OrdersTableTableReferences
+    extends BaseReferences<_$AppDatabase, $OrdersTableTable, OrdersTableData> {
+  $$OrdersTableTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$OrderItemsTableTable, List<OrderItemsTableData>>
+  _orderItemsTableRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.orderItemsTable,
+    aliasName: 'orders_table__id__order_items_table__order_id',
+  );
+
+  $$OrderItemsTableTableProcessedTableManager get orderItemsTableRefs {
+    final manager = $$OrderItemsTableTableTableManager(
+      $_db,
+      $_db.orderItemsTable,
+    ).filter((f) => f.orderId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _orderItemsTableRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$OrdersTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OrdersTableTable> {
+  $$OrdersTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isSynced => $composableBuilder(
+    column: $table.isSynced,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get tableNumber => $composableBuilder(
+    column: $table.tableNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> orderItemsTableRefs(
+    Expression<bool> Function($$OrderItemsTableTableFilterComposer f) f,
+  ) {
+    final $$OrderItemsTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.orderItemsTable,
+      getReferencedColumn: (t) => t.orderId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrderItemsTableTableFilterComposer(
+            $db: $db,
+            $table: $db.orderItemsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$OrdersTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OrdersTableTable> {
+  $$OrdersTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isSynced => $composableBuilder(
+    column: $table.isSynced,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tableNumber => $composableBuilder(
+    column: $table.tableNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$OrdersTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OrdersTableTable> {
+  $$OrdersTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get total =>
+      $composableBuilder(column: $table.total, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isSynced =>
+      $composableBuilder(column: $table.isSynced, builder: (column) => column);
+
+  GeneratedColumn<int> get tableNumber => $composableBuilder(
+    column: $table.tableNumber,
+    builder: (column) => column,
+  );
+
+  Expression<T> orderItemsTableRefs<T extends Object>(
+    Expression<T> Function($$OrderItemsTableTableAnnotationComposer a) f,
+  ) {
+    final $$OrderItemsTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.orderItemsTable,
+      getReferencedColumn: (t) => t.orderId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrderItemsTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.orderItemsTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$OrdersTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OrdersTableTable,
+          OrdersTableData,
+          $$OrdersTableTableFilterComposer,
+          $$OrdersTableTableOrderingComposer,
+          $$OrdersTableTableAnnotationComposer,
+          $$OrdersTableTableCreateCompanionBuilder,
+          $$OrdersTableTableUpdateCompanionBuilder,
+          (OrdersTableData, $$OrdersTableTableReferences),
+          OrdersTableData,
+          PrefetchHooks Function({bool orderItemsTableRefs})
+        > {
+  $$OrdersTableTableTableManager(_$AppDatabase db, $OrdersTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OrdersTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OrdersTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OrdersTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<double> total = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isSynced = const Value.absent(),
+                Value<int> tableNumber = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OrdersTableCompanion(
+                id: id,
+                total: total,
+                status: status,
+                createdAt: createdAt,
+                isSynced: isSynced,
+                tableNumber: tableNumber,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required double total,
+                required String status,
+                required DateTime createdAt,
+                Value<bool> isSynced = const Value.absent(),
+                Value<int> tableNumber = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => OrdersTableCompanion.insert(
+                id: id,
+                total: total,
+                status: status,
+                createdAt: createdAt,
+                isSynced: isSynced,
+                tableNumber: tableNumber,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$OrdersTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({orderItemsTableRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (orderItemsTableRefs) db.orderItemsTable,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (orderItemsTableRefs)
+                    await $_getPrefetchedData<
+                      OrdersTableData,
+                      $OrdersTableTable,
+                      OrderItemsTableData
+                    >(
+                      currentTable: table,
+                      referencedTable: $$OrdersTableTableReferences
+                          ._orderItemsTableRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$OrdersTableTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).orderItemsTableRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.orderId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$OrdersTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OrdersTableTable,
+      OrdersTableData,
+      $$OrdersTableTableFilterComposer,
+      $$OrdersTableTableOrderingComposer,
+      $$OrdersTableTableAnnotationComposer,
+      $$OrdersTableTableCreateCompanionBuilder,
+      $$OrdersTableTableUpdateCompanionBuilder,
+      (OrdersTableData, $$OrdersTableTableReferences),
+      OrdersTableData,
+      PrefetchHooks Function({bool orderItemsTableRefs})
+    >;
+typedef $$OrderItemsTableTableCreateCompanionBuilder =
+    OrderItemsTableCompanion Function({
+      Value<int> id,
+      required String orderId,
+      required String productName,
+      required int quantity,
+    });
+typedef $$OrderItemsTableTableUpdateCompanionBuilder =
+    OrderItemsTableCompanion Function({
+      Value<int> id,
+      Value<String> orderId,
+      Value<String> productName,
+      Value<int> quantity,
+    });
+
+final class $$OrderItemsTableTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $OrderItemsTableTable,
+          OrderItemsTableData
+        > {
+  $$OrderItemsTableTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $OrdersTableTable _orderIdTable(_$AppDatabase db) => db.ordersTable
+      .createAlias('order_items_table__order_id__orders_table__id');
+
+  $$OrdersTableTableProcessedTableManager get orderId {
+    final $_column = $_itemColumn<String>('order_id')!;
+
+    final manager = $$OrdersTableTableTableManager(
+      $_db,
+      $_db.ordersTable,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_orderIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$OrderItemsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $OrderItemsTableTable> {
+  $$OrderItemsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$OrdersTableTableFilterComposer get orderId {
+    final $$OrdersTableTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderId,
+      referencedTable: $db.ordersTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdersTableTableFilterComposer(
+            $db: $db,
+            $table: $db.ordersTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrderItemsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $OrderItemsTableTable> {
+  $$OrderItemsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$OrdersTableTableOrderingComposer get orderId {
+    final $$OrdersTableTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderId,
+      referencedTable: $db.ordersTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdersTableTableOrderingComposer(
+            $db: $db,
+            $table: $db.ordersTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrderItemsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $OrderItemsTableTable> {
+  $$OrderItemsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  $$OrdersTableTableAnnotationComposer get orderId {
+    final $$OrdersTableTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.orderId,
+      referencedTable: $db.ordersTable,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$OrdersTableTableAnnotationComposer(
+            $db: $db,
+            $table: $db.ordersTable,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$OrderItemsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $OrderItemsTableTable,
+          OrderItemsTableData,
+          $$OrderItemsTableTableFilterComposer,
+          $$OrderItemsTableTableOrderingComposer,
+          $$OrderItemsTableTableAnnotationComposer,
+          $$OrderItemsTableTableCreateCompanionBuilder,
+          $$OrderItemsTableTableUpdateCompanionBuilder,
+          (OrderItemsTableData, $$OrderItemsTableTableReferences),
+          OrderItemsTableData,
+          PrefetchHooks Function({bool orderId})
+        > {
+  $$OrderItemsTableTableTableManager(
+    _$AppDatabase db,
+    $OrderItemsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$OrderItemsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$OrderItemsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$OrderItemsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> orderId = const Value.absent(),
+                Value<String> productName = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+              }) => OrderItemsTableCompanion(
+                id: id,
+                orderId: orderId,
+                productName: productName,
+                quantity: quantity,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String orderId,
+                required String productName,
+                required int quantity,
+              }) => OrderItemsTableCompanion.insert(
+                id: id,
+                orderId: orderId,
+                productName: productName,
+                quantity: quantity,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$OrderItemsTableTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({orderId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (orderId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.orderId,
+                                referencedTable:
+                                    $$OrderItemsTableTableReferences
+                                        ._orderIdTable(db),
+                                referencedColumn:
+                                    $$OrderItemsTableTableReferences
+                                        ._orderIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$OrderItemsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $OrderItemsTableTable,
+      OrderItemsTableData,
+      $$OrderItemsTableTableFilterComposer,
+      $$OrderItemsTableTableOrderingComposer,
+      $$OrderItemsTableTableAnnotationComposer,
+      $$OrderItemsTableTableCreateCompanionBuilder,
+      $$OrderItemsTableTableUpdateCompanionBuilder,
+      (OrderItemsTableData, $$OrderItemsTableTableReferences),
+      OrderItemsTableData,
+      PrefetchHooks Function({bool orderId})
+    >;
+typedef $$ReviewsTableTableCreateCompanionBuilder =
+    ReviewsTableCompanion Function({
+      Value<int> id,
+      required String productId,
+      required int rating,
+      Value<String> comment,
+      Value<String> userName,
+      required DateTime createdAt,
+    });
+typedef $$ReviewsTableTableUpdateCompanionBuilder =
+    ReviewsTableCompanion Function({
+      Value<int> id,
+      Value<String> productId,
+      Value<int> rating,
+      Value<String> comment,
+      Value<String> userName,
+      Value<DateTime> createdAt,
+    });
+
+class $$ReviewsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ReviewsTableTable> {
+  $$ReviewsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get comment => $composableBuilder(
+    column: $table.comment,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get userName => $composableBuilder(
+    column: $table.userName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ReviewsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ReviewsTableTable> {
+  $$ReviewsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get rating => $composableBuilder(
+    column: $table.rating,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get comment => $composableBuilder(
+    column: $table.comment,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get userName => $composableBuilder(
+    column: $table.userName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ReviewsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ReviewsTableTable> {
+  $$ReviewsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<int> get rating =>
+      $composableBuilder(column: $table.rating, builder: (column) => column);
+
+  GeneratedColumn<String> get comment =>
+      $composableBuilder(column: $table.comment, builder: (column) => column);
+
+  GeneratedColumn<String> get userName =>
+      $composableBuilder(column: $table.userName, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ReviewsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ReviewsTableTable,
+          ReviewsTableData,
+          $$ReviewsTableTableFilterComposer,
+          $$ReviewsTableTableOrderingComposer,
+          $$ReviewsTableTableAnnotationComposer,
+          $$ReviewsTableTableCreateCompanionBuilder,
+          $$ReviewsTableTableUpdateCompanionBuilder,
+          (
+            ReviewsTableData,
+            BaseReferences<_$AppDatabase, $ReviewsTableTable, ReviewsTableData>,
+          ),
+          ReviewsTableData,
+          PrefetchHooks Function()
+        > {
+  $$ReviewsTableTableTableManager(_$AppDatabase db, $ReviewsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ReviewsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ReviewsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ReviewsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> productId = const Value.absent(),
+                Value<int> rating = const Value.absent(),
+                Value<String> comment = const Value.absent(),
+                Value<String> userName = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => ReviewsTableCompanion(
+                id: id,
+                productId: productId,
+                rating: rating,
+                comment: comment,
+                userName: userName,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String productId,
+                required int rating,
+                Value<String> comment = const Value.absent(),
+                Value<String> userName = const Value.absent(),
+                required DateTime createdAt,
+              }) => ReviewsTableCompanion.insert(
+                id: id,
+                productId: productId,
+                rating: rating,
+                comment: comment,
+                userName: userName,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ReviewsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ReviewsTableTable,
+      ReviewsTableData,
+      $$ReviewsTableTableFilterComposer,
+      $$ReviewsTableTableOrderingComposer,
+      $$ReviewsTableTableAnnotationComposer,
+      $$ReviewsTableTableCreateCompanionBuilder,
+      $$ReviewsTableTableUpdateCompanionBuilder,
+      (
+        ReviewsTableData,
+        BaseReferences<_$AppDatabase, $ReviewsTableTable, ReviewsTableData>,
+      ),
+      ReviewsTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$FavoritesTableTableCreateCompanionBuilder =
+    FavoritesTableCompanion Function({
+      Value<int> id,
+      required String productId,
+      required DateTime addedAt,
+    });
+typedef $$FavoritesTableTableUpdateCompanionBuilder =
+    FavoritesTableCompanion Function({
+      Value<int> id,
+      Value<String> productId,
+      Value<DateTime> addedAt,
+    });
+
+class $$FavoritesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $FavoritesTableTable> {
+  $$FavoritesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FavoritesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $FavoritesTableTable> {
+  $$FavoritesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get addedAt => $composableBuilder(
+    column: $table.addedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FavoritesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FavoritesTableTable> {
+  $$FavoritesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get addedAt =>
+      $composableBuilder(column: $table.addedAt, builder: (column) => column);
+}
+
+class $$FavoritesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FavoritesTableTable,
+          FavoritesTableData,
+          $$FavoritesTableTableFilterComposer,
+          $$FavoritesTableTableOrderingComposer,
+          $$FavoritesTableTableAnnotationComposer,
+          $$FavoritesTableTableCreateCompanionBuilder,
+          $$FavoritesTableTableUpdateCompanionBuilder,
+          (
+            FavoritesTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $FavoritesTableTable,
+              FavoritesTableData
+            >,
+          ),
+          FavoritesTableData,
+          PrefetchHooks Function()
+        > {
+  $$FavoritesTableTableTableManager(
+    _$AppDatabase db,
+    $FavoritesTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FavoritesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FavoritesTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FavoritesTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> productId = const Value.absent(),
+                Value<DateTime> addedAt = const Value.absent(),
+              }) => FavoritesTableCompanion(
+                id: id,
+                productId: productId,
+                addedAt: addedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String productId,
+                required DateTime addedAt,
+              }) => FavoritesTableCompanion.insert(
+                id: id,
+                productId: productId,
+                addedAt: addedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FavoritesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FavoritesTableTable,
+      FavoritesTableData,
+      $$FavoritesTableTableFilterComposer,
+      $$FavoritesTableTableOrderingComposer,
+      $$FavoritesTableTableAnnotationComposer,
+      $$FavoritesTableTableCreateCompanionBuilder,
+      $$FavoritesTableTableUpdateCompanionBuilder,
+      (
+        FavoritesTableData,
+        BaseReferences<_$AppDatabase, $FavoritesTableTable, FavoritesTableData>,
+      ),
+      FavoritesTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2029,4 +4418,12 @@ class $AppDatabaseManager {
       $$CategoriesTableTableTableManager(_db, _db.categoriesTable);
   $$ProductsTableTableTableManager get productsTable =>
       $$ProductsTableTableTableManager(_db, _db.productsTable);
+  $$OrdersTableTableTableManager get ordersTable =>
+      $$OrdersTableTableTableManager(_db, _db.ordersTable);
+  $$OrderItemsTableTableTableManager get orderItemsTable =>
+      $$OrderItemsTableTableTableManager(_db, _db.orderItemsTable);
+  $$ReviewsTableTableTableManager get reviewsTable =>
+      $$ReviewsTableTableTableManager(_db, _db.reviewsTable);
+  $$FavoritesTableTableTableManager get favoritesTable =>
+      $$FavoritesTableTableTableManager(_db, _db.favoritesTable);
 }

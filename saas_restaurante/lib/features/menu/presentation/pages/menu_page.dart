@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/menu_bloc.dart';
-import '../bloc/menu_event.dart';
-import '../bloc/menu_state.dart';
-import '../widgets/product_card.dart';
+import 'package:go_router/go_router.dart';
+import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
+import '../blocs/menu_bloc.dart';
+import '../blocs/menu_event.dart';
+import '../blocs/menu_state.dart';
+import '../../../cart/presentation/cubit/cart_cubit.dart';
+import '../../../cart/domain/entities/cart_item_entity.dart';
+import '../../../../Core/layout/main_layout.dart';
+import '../../../../Core/injection_container.dart' as di;
+import '../../../../Core/secure_storage/secure_storage_service.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
+import '../../../favorites/presentation/bloc/favorites_event.dart';
+import '../../../favorites/presentation/bloc/favorites_state.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -13,38 +22,66 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  final primaryColor = const Color(0xFFB02F00);
+  final Color primaryColor = const Color(0xFFB02F00);
+  String? _currentTableId;
 
   @override
   void initState() {
     super.initState();
     context.read<MenuBloc>().add(LoadMenuRequested());
+    _loadCurrentTable();
+  }
+
+  Future<void> _loadCurrentTable() async {
+    final storage = di.sl<SecureStorageService>();
+    final tableId = await storage.getTableId();
+    if (mounted) {
+      setState(() => _currentTableId = tableId);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isWideScreen = MediaQuery.of(context).size.width >= 800;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: Text(
-          'GourmetFlow',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, letterSpacing: -0.5),
-        ),
+        leading: isWideScreen
+            ? null
+            : Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      MainLayoutScope.of(context)?.scaffoldKey.currentState?.openDrawer();
+                    },
+                  );
+                },
+              ),
+        title: const Text('Restaurante SaaS', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
+        foregroundColor: primaryColor,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black87),
-            onPressed: () {
-            },
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+            tooltip: 'Escanear Mesa',
+            onPressed: () => context.go('/scanner'),
           ),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart_outlined),
+            onPressed: () => context.push('/cart'),
+          )
         ],
       ),
       body: BlocBuilder<MenuBloc, MenuState>(
         builder: (context, state) {
-          if (state is MenuLoading) {
+          if (state is MenuInitial || state is MenuLoading) {
             return Center(child: CircularProgressIndicator(color: primaryColor));
-          } else if (state is MenuError) {
+          }
+
+          if (state is MenuError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -54,14 +91,61 @@ class _MenuPageState extends State<MenuPage> {
                   Text(state.message),
                   TextButton(
                     onPressed: () => context.read<MenuBloc>().add(LoadMenuRequested()),
-                    child: const Text('Reintentar'),
-                  ),
+                    child: Text('Reintentar', style: TextStyle(color: primaryColor)),
+                  )
                 ],
               ),
             );
-          } else if (state is MenuLoaded) {
+          }
+
+          if (state is MenuLoaded) {
+            if (state.categories.isEmpty) {
+              return const Center(child: Text('Aún no hay platos en el menú.'));
+            }
+
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // --- INDICADOR DE MESA ACTIVA ---
+                if (_currentTableId != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    color: const Color(0xFF1B5E20).withOpacity(0.08),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B5E20).withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.table_restaurant_rounded,
+                              size: 16, color: Color(0xFF1B5E20)),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Mesa #$_currentTableId activa',
+                          style: RSTypography.labelMedium.copyWith(
+                            color: const Color(0xFF1B5E20),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => context.go('/scanner'),
+                          child: Text(
+                            'Cambiar',
+                            style: RSTypography.labelSmall.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                // --- CINTA DE CATEGORÍAS ---
                 SizedBox(
                   height: 60,
                   child: ListView.builder(
@@ -82,52 +166,111 @@ class _MenuPageState extends State<MenuPage> {
                             color: isSelected ? Colors.white : Colors.black87,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                           ),
-                          onSelected: (_) {
-                            context.read<MenuBloc>().add(CategorySelected(category.id));
+                          onSelected: (selected) {
+                            if (selected) {
+                              context.read<MenuBloc>().add(CategorySelected(category.id));
+                            }
                           },
                         ),
                       );
                     },
                   ),
                 ),
-                
+
+                // --- LISTA DE PRODUCTOS ---
                 Expanded(
-                  child: state.products.isEmpty
-                      ? const Center(child: Text('No hay productos en esta categoría.'))
-                      : GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, 
-                            childAspectRatio: 0.7, 
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.products.length,
+                    itemBuilder: (context, index) {
+                      final product = state.products[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(16),
+                          onTap: () => context.go('/product/${product.id}'),
+                          title: Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(product.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Bs. ${product.price.toStringAsFixed(2)}', 
+                                  style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 16)
+                                ),
+                              ],
+                            ),
                           ),
-                          itemCount: state.products.length,
-                          itemBuilder: (context, index) {
-                            final product = state.products[index];
-                            return ProductCard(
-                              product: product,
-                              onAddPressed: () {
-                                context.read<CartCubit>().addItem(CartItemEntity(
-                                    productId: product.id,
-                                    name: product.name,
-                                    price: product.price,
-                                    quantity: 1,
-                                )); 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${product.name} añadido al carrito'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                            );
-                          },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              BlocBuilder<FavoritesBloc, FavoritesState>(
+                                builder: (context, state) {
+                                  bool isFav = false;
+                                  if (state is FavoritesLoaded) {
+                                    isFav = state.favorites.any((f) => f.productId == product.id);
+                                  }
+                                  return IconButton(
+                                    icon: Icon(
+                                      isFav ? Icons.favorite : Icons.favorite_border,
+                                      color: isFav ? Colors.red : Colors.grey.shade600,
+                                    ),
+                                    onPressed: () {
+                                      context.read<FavoritesBloc>().add(ToggleFavoriteRequested(product.id));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            isFav
+                                                ? 'Quitado de favoritos'
+                                                : 'Agregado a favoritos',
+                                          ),
+                                          duration: const Duration(milliseconds: 700),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: IconButton(
+                                  icon: Icon(Icons.add, color: primaryColor),
+                                  onPressed: () {
+                                    context.read<CartCubit>().addItem(CartItemEntity(
+                                      productId: product.id,
+                                      name: product.name,
+                                      price: product.price,
+                                      quantity: 1,
+                                    ));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${product.name} agregado al carrito'),
+                                        duration: const Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                      );
+                    },
+                  ),
                 ),
               ],
             );
           }
+
           return const SizedBox.shrink();
         },
       ),

@@ -4,11 +4,13 @@ import 'orders_event.dart';
 import 'orders_state.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/repositories/order_repository.dart';
+import '../../../../Core/secure_storage/secure_storage_service.dart';
 
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final OrderRepository repository;
+  final SecureStorageService secureStorage;
 
-  OrdersBloc(this.repository) : super(OrdersInitial()) {
+  OrdersBloc(this.repository, this.secureStorage) : super(OrdersInitial()) {
     on<ConfirmOrderRequested>(_onConfirmOrderRequested);
     on<LoadMyOrdersRequested>(_onLoadMyOrdersRequested);
   }
@@ -17,6 +19,8 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
     emit(OrdersLoading());
     try {
       final orderId = const Uuid().v4();
+      final tableId = await secureStorage.getTableId();
+      final tableNumber = int.tryParse(tableId ?? '0') ?? 0;
 
       final orderItems = event.cartItems.map((c) => OrderItemEntity(
         productName: c.name,
@@ -28,6 +32,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
         status: 'preparing', 
         createdAt: DateTime.now(),
         items: orderItems,
+        tableNumber: tableNumber,
       );
       await repository.createOrder(newOrder);
       

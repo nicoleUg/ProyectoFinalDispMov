@@ -46,6 +46,14 @@ dependencies:
   equatable: ^2.0.8
   drift_flutter: ^0.3.0
   uuid: ^4.5.1
+  restaurantesaas_design_system:
+    git:
+      url: https://github.com/nicoleUg/designSystem-RestauranteSaas.git
+      ref: main
+  image_picker: ^1.2.2
+  fl_chart: ^1.2.0
+  mobile_scanner: ^6.0.5
+  permission_handler: ^12.0.0+1
 
 dev_dependencies:
   flutter_test:
