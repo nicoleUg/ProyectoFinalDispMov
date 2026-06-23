@@ -50,6 +50,7 @@ dependencies:
     git:
       url: https://github.com/nicoleUg/designSystem-RestauranteSaas.git
       ref: main
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:

@@ -21,6 +21,7 @@ class AdminMenuBloc extends Bloc<AdminMenuEvent, AdminMenuState> {
     on<LoadAdminMenuRequested>(_onLoadAdminMenuRequested);
     on<AddCategoryRequested>(_onAddCategoryRequested);
     on<AddProductRequested>(_onAddProductRequested);
+    on<UpdateProductRequested>(_onUpdateProductRequested);
   }
 
   Future<void> _onLoadAdminMenuRequested(
@@ -79,6 +80,20 @@ class AdminMenuBloc extends Bloc<AdminMenuEvent, AdminMenuState> {
       emit(const AdminMenuActionSuccess('Producto creado exitosamente'));
     } catch (e) {
       emit(AdminMenuError('Error al crear producto: $e'));
+    }
+  }
+
+  Future<void> _onUpdateProductRequested(
+    UpdateProductRequested event,
+    Emitter<AdminMenuState> emit,
+  ) async {
+    emit(AdminMenuLoading());
+    try {
+      // Simulado debido a falta de endpoint de edición en el backend
+      await Future.delayed(const Duration(milliseconds: 800));
+      emit(const AdminMenuActionSuccess('Producto actualizado exitosamente (Simulado)'));
+    } catch (e) {
+      emit(AdminMenuError('Error al actualizar producto: $e'));
     }
   }
 }

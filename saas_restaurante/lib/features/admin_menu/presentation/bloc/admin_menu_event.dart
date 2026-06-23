@@ -42,3 +42,27 @@ class AddProductRequested extends AdminMenuEvent {
   @override
   List<Object?> get props => [categoryId, name, description, price, localImagePath];
 }
+
+class UpdateProductRequested extends AdminMenuEvent {
+  final String productId;
+  final String categoryId;
+  final String name;
+  final String description;
+  final double price;
+  final String? localImagePath;
+  final bool isAvailable;
+
+  const UpdateProductRequested({
+    required this.productId,
+    required this.categoryId,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.localImagePath,
+    required this.isAvailable,
+  });
+
+  @override
+  List<Object?> get props => [productId, categoryId, name, description, price, localImagePath, isAvailable];
+}
+

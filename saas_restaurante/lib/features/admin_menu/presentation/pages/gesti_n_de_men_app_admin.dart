@@ -371,7 +371,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.between,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
@@ -402,7 +402,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                   ),
                   RSSpacing.verticalMd,
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.between,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Availability switch
                       Row(
