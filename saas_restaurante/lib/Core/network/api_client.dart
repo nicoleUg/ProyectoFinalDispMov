@@ -14,8 +14,9 @@ class ApiClient {
     
     try {
       if (!kIsWeb) {
-        if (Platform.isAndroid) {
-          baseUrl = 'http://10.0.2.2:3000';
+        if (Platform.isAndroid || Platform.isIOS) {
+          // Cambiado de 10.0.2.2 (solo emulador) a la IP local de tu PC en la red Wi-Fi para dar soporte a celulares reales.
+          baseUrl = 'http://10.10.4.86:3000';
         }
       }
     } catch (e) {
