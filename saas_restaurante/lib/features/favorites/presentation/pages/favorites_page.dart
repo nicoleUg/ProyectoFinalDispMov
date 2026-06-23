@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../Core/layout/main_layout.dart';
 import '../../presentation/bloc/favorites_bloc.dart';
 import '../../presentation/bloc/favorites_event.dart';
 import '../../presentation/bloc/favorites_state.dart';
@@ -24,18 +25,23 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = const Color(0xFFB02F00);
+    final bool isWideScreen = MediaQuery.of(context).size.width >= 800;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            );
-          },
-        ),
+        leading: isWideScreen
+            ? null
+            : Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      MainLayoutScope.of(context)?.scaffoldKey.currentState?.openDrawer();
+                    },
+                  );
+                },
+              ),
         title: const Text('Platos Favoritos', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: primaryColor,

@@ -14,6 +14,8 @@ import 'features/admin_reports/presentation/bloc/admin_reports_event.dart';
 import 'features/table_scanner/presentation/bloc/table_scanner_bloc.dart';
 import 'features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'features/favorites/presentation/bloc/favorites_event.dart';
+import 'features/orders/presentation/bloc/orders_bloc.dart';
+import 'features/orders/presentation/bloc/orders_event.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -45,6 +47,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<FavoritesBloc>(
           create: (context) => di.sl<FavoritesBloc>()..add(LoadFavoritesRequested()),
+        ),
+        BlocProvider<OrdersBloc>(
+          create: (context) => di.sl<OrdersBloc>()..add(LoadMyOrdersRequested()),
         ),
       ],
       child: MaterialApp.router(

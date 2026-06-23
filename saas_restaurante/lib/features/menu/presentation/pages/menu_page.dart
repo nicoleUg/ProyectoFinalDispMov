@@ -7,7 +7,7 @@ import '../blocs/menu_event.dart';
 import '../blocs/menu_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/domain/entities/cart_item_entity.dart';
-import '../../../deeplinking/presentation/widgets/deeplink_simulator_dialog.dart';
+import '../../../../Core/layout/main_layout.dart';
 import '../../../../Core/injection_container.dart' as di;
 import '../../../../Core/secure_storage/secure_storage_service.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
@@ -42,17 +42,23 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWideScreen = MediaQuery.of(context).size.width >= 800;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openDrawer(),
-            );
-          },
-        ),
+        leading: isWideScreen
+            ? null
+            : Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      MainLayoutScope.of(context)?.scaffoldKey.currentState?.openDrawer();
+                    },
+                  );
+                },
+              ),
         title: const Text('Restaurante SaaS', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         foregroundColor: primaryColor,
@@ -62,16 +68,6 @@ class _MenuPageState extends State<MenuPage> {
             icon: const Icon(Icons.qr_code_scanner_rounded),
             tooltip: 'Escanear Mesa',
             onPressed: () => context.go('/scanner'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.link),
-            tooltip: 'Simular Deeplink',
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const DeeplinkSimulatorDialog(),
-              );
-            },
           ),
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined),

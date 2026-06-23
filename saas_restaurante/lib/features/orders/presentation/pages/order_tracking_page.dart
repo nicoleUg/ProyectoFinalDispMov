@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
+import '../../../../Core/layout/main_layout.dart';
 import '../bloc/orders_bloc.dart';
 import '../bloc/orders_event.dart';
 import '../bloc/orders_state.dart';
@@ -32,6 +33,8 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWideScreen = MediaQuery.of(context).size.width >= 800;
+
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
@@ -48,14 +51,18 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                   }
                 },
               )
-            : Builder(
-                builder: (context) {
-                  return IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
-                  );
-                },
-              ),
+            : (isWideScreen
+                ? null
+                : Builder(
+                    builder: (context) {
+                      return IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () {
+                          MainLayoutScope.of(context)?.scaffoldKey.currentState?.openDrawer();
+                        },
+                      );
+                    },
+                  )),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
