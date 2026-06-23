@@ -18,9 +18,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onCheckAuthRequested(CheckAuthRequested event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final isLoggedIn = await authRepository.isLoggedIn();
-      if (isLoggedIn) {
-        emit(const AuthAuthenticated());
+      final user = await authRepository.getLoggedInUser();
+      if (user != null) {
+        emit(AuthAuthenticated(user));
       } else {
         emit(AuthUnauthenticated());
       }
@@ -33,7 +33,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading()); 
     try {
       await authRepository.login(event.email, event.password);
-      emit(const AuthAuthenticated()); 
+      final user = await authRepository.getLoggedInUser();
+      emit(AuthAuthenticated(user)); 
     } catch (e) {
       emit(const AuthError('Usuario o contraseña incorrectos.')); 
     }
@@ -44,6 +45,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await authRepository.logout();
     emit(AuthUnauthenticated()); 
   }
+
   Future<void> _onRegisterRequested(
     RegisterRequested event,
     Emitter<AuthState> emit,
@@ -56,8 +58,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // 2. Si el registro fue exitoso, hacemos el login automático para obtener el token
       await authRepository.login(event.email, event.password);
       
-      // 3. ¡Navegamos al menú!
-      emit(const AuthAuthenticated());
+      // 3. Obtener los detalles del usuario
+      final user = await authRepository.getLoggedInUser();
+      
+      // 4. ¡Navegamos al menú!
+      emit(AuthAuthenticated(user));
     } catch (e) {
       emit(const AuthError('Error al registrar: Es posible que el correo ya esté en uso.'));
     }
