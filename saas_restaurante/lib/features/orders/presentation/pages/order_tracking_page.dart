@@ -131,7 +131,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: RSColors.surfaceVariant,
+              color: RSColors.surfaceContainerLow,
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.receipt_long_outlined, size: 56, color: RSColors.textOnSurfaceVariant),
@@ -391,7 +391,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
           Stack(
             alignment: Alignment.center,
             children: [
-              Container(height: 4, color: RSColors.surfaceVariant),
+              Container(height: 4, color: RSColors.surfaceContainerLow),
               FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: progress,
@@ -425,7 +425,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: isCompleted || isActive ? RSColors.primary : RSColors.surfaceVariant,
+            color: isCompleted || isActive ? RSColors.primary : RSColors.surfaceContainerLow,
             shape: BoxShape.circle,
             border: isActive
                 ? Border.all(color: RSColors.primary.withOpacity(0.4), width: 4)
@@ -500,7 +500,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
             ],
           ),
           const SizedBox(height: 16),
-          Container(height: 1, color: RSColors.surfaceVariant),
+          Container(height: 1, color: RSColors.outlineVariant),
           const SizedBox(height: 16),
 
           // Items list
@@ -534,7 +534,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
               )),
 
           const SizedBox(height: 12),
-          Container(height: 1, color: RSColors.surfaceVariant),
+          Container(height: 1, color: RSColors.outlineVariant),
           const SizedBox(height: 12),
 
           Align(

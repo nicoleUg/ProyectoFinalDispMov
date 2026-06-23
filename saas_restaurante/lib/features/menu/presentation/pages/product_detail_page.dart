@@ -8,6 +8,10 @@ import '../blocs/menu_state.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/domain/entities/cart_item_entity.dart';
 import '../../domain/entities/product_entity.dart';
+import '../../../../Core/injection_container.dart' as di;
+import '../../../reviews/presentation/bloc/reviews_bloc.dart';
+import '../../../reviews/presentation/widgets/rating_dialog.dart';
+import '../../../reviews/domain/entities/review_entity.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -61,24 +65,27 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: RSColors.background,
-      body: BlocBuilder<MenuBloc, MenuState>(
-        builder: (context, state) {
-          if (state is MenuLoading || state is MenuInitial) {
-            return const Center(
-              child: CircularProgressIndicator(color: RSColors.primary),
-            );
-          }
+    return BlocProvider(
+      create: (_) => di.sl<ReviewsBloc>()..add(LoadReviewsRequested(widget.productId)),
+      child: Scaffold(
+        backgroundColor: RSColors.background,
+        body: BlocBuilder<MenuBloc, MenuState>(
+          builder: (context, state) {
+            if (state is MenuLoading || state is MenuInitial) {
+              return const Center(
+                child: CircularProgressIndicator(color: RSColors.primary),
+              );
+            }
 
-          final product = _findProduct(state);
+            final product = _findProduct(state);
 
-          if (product == null) {
-            return _buildNotFound(context);
-          }
+            if (product == null) {
+              return _buildNotFound(context);
+            }
 
-          return _buildContent(context, product);
-        },
+            return _buildContent(context, product);
+          },
+        ),
       ),
     );
   }
@@ -260,7 +267,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     const SizedBox(height: 20),
 
                     // Divider
-                    Container(height: 1, color: RSColors.surfaceVariant),
+                    Container(height: 1, color: RSColors.outlineVariant),
                     const SizedBox(height: 20),
 
                     // Description
@@ -268,7 +275,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                       'Descripción',
                       style: RSTypography.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: RSColors.textOnSurface,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -332,6 +339,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                       label: 'Volver al Menú',
                       onPressed: () => context.go('/'),
                     ),
+                    const SizedBox(height: 16),
+                    _buildReviewsSection(context, product),
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -360,6 +369,250 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       ),
     );
   }
+
+  Widget _buildReviewsSection(BuildContext context, ProductEntity product) {
+    return BlocBuilder<ReviewsBloc, ReviewsState>(
+      builder: (context, state) {
+        if (state is ReviewsLoading) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(
+              child: CircularProgressIndicator(color: RSColors.primary),
+            ),
+          );
+        }
+
+        List<ReviewEntity> reviews = [];
+        double avgRating = 0.0;
+
+        if (state is ReviewsLoaded) {
+          reviews = state.reviews;
+          avgRating = state.averageRating;
+        } else if (state is ReviewSubmitted) {
+          reviews = state.reviews;
+          avgRating = state.averageRating;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Text(
+              'Calificaciones y Reseñas',
+              style: RSTypography.titleMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Summary Card
+            RSCard(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        avgRating.toStringAsFixed(1),
+                        style: RSTypography.headlineMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: RSColors.primary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            index < avgRating.round()
+                                ? Icons.star_rounded
+                                : Icons.star_border_rounded,
+                            color: const Color(0xFFFFB300),
+                            size: 20,
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${reviews.length} ${reviews.length == 1 ? 'opinión' : 'opiniones'}',
+                        style: RSTypography.bodySmall.copyWith(
+                          color: RSColors.textOnSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      children: List.generate(5, (index) {
+                        final starLevel = 5 - index;
+                        final count = reviews.where((r) => r.rating == starLevel).length;
+                        final pct = reviews.isEmpty ? 0.0 : count / reviews.length;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Text(
+                                '$starLevel',
+                                style: RSTypography.labelSmall.copyWith(
+                                  color: RSColors.textOnSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: pct,
+                                    backgroundColor: RSColors.surfaceContainerLow,
+                                    color: const Color(0xFFFFB300),
+                                    minHeight: 6,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '$count',
+                                style: RSTypography.labelSmall.copyWith(
+                                  color: RSColors.textOnSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Opiniones',
+                  style: RSTypography.titleSmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final result = await showRatingDialog(
+                      context,
+                      productId: product.id,
+                      productName: product.name,
+                    );
+                    if (result == true && context.mounted) {
+                      context.read<ReviewsBloc>().add(LoadReviewsRequested(product.id));
+                    }
+                  },
+                  icon: const Icon(Icons.rate_review_outlined, size: 18),
+                  label: Text(
+                    'Calificar',
+                    style: RSTypography.labelMedium.copyWith(color: RSColors.primary),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: RSColors.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (reviews.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline_rounded,
+                        size: 40,
+                        color: RSColors.textOnSurfaceVariant.withOpacity(0.5),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Aún no hay opiniones para este plato.',
+                        style: RSTypography.bodyMedium.copyWith(
+                          color: RSColors.textOnSurfaceVariant,
+                        ),
+                      ),
+                      Text(
+                        '¡Sé el primero en calificarlo!',
+                        style: RSTypography.bodySmall.copyWith(
+                          color: RSColors.textOnSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: reviews.length,
+                itemBuilder: (context, index) {
+                  final review = reviews[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: RSCard(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                review.userName,
+                                style: RSTypography.labelMedium.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${review.createdAt.day}/${review.createdAt.month}/${review.createdAt.year}',
+                                style: RSTypography.labelSmall.copyWith(
+                                  color: RSColors.textOnSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: List.generate(5, (starIdx) {
+                              return Icon(
+                                starIdx < review.rating
+                                    ? Icons.star_rounded
+                                    : Icons.star_border_rounded,
+                                color: const Color(0xFFFFB300),
+                                size: 16,
+                              );
+                            }),
+                          ),
+                          if (review.comment.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              review.comment,
+                              style: RSTypography.bodyMedium.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class _InfoChip extends StatelessWidget {
@@ -372,7 +625,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: RSColors.surfaceVariant,
+        color: RSColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
