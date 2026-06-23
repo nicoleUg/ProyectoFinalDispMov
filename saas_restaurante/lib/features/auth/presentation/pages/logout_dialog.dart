@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'dart:ui'; 
+import 'dart:ui';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_event.dart';
+
 class LogoutDialog extends StatelessWidget {
   const LogoutDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = const Color(0xFFB02F00);
-
-    final surfaceContainerHigh = const Color(0xFFEDEEEF);
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
@@ -36,7 +39,7 @@ class LogoutDialog extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                "Tendras que iniciar sesion otra vez si quieres pedir",
+                "Tendrás que iniciar sesión otra vez si quieres pedir",
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey),
               ),
@@ -48,9 +51,12 @@ class LogoutDialog extends StatelessWidget {
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(backgroundColor: primaryColor),
                   onPressed: () {
+                    Navigator.of(context).pop();
+                    context.read<AuthBloc>().add(LogoutRequested());
+                    context.go('/login');
                   },
                   icon: const Icon(Icons.logout),
-                  label: const Text('Log Out'),
+                  label: const Text('Cerrar Sesión'),
                 ),
               ),
               const SizedBox(height: 12),
@@ -64,7 +70,7 @@ class LogoutDialog extends StatelessWidget {
                     side: BorderSide(color: primaryColor.withOpacity(0.5), width: 2),
                   ),
                   onPressed: () => Navigator.of(context).pop(), 
-                  child: const Text('Cancel'),
+                  child: const Text('Cancelar'),
                 ),
               ),
             ],

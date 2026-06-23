@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart';
 import '../bloc/orders_bloc.dart';
 import '../bloc/orders_event.dart';
@@ -36,6 +37,25 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
+        leading: _isDeeplinkMode
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  } else {
+                    context.go('/');
+                  }
+                },
+              )
+            : Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  );
+                },
+              ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
