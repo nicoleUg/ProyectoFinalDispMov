@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../../Core/network/api_client.dart';
 import '../models/category_model.dart';
 import '../models/product_model.dart';
@@ -48,10 +49,21 @@ class MenuRepository {
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
-        formDataMap['image'] = await MultipartFile.fromFile(
-          localImagePath,
-          filename: fileName,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            localImagePath,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          formDataMap['image'] = MultipartFile.fromBytes(
+            response.data!,
+            filename: fileName,
+          );
+        } else {
+          formDataMap['image'] = await MultipartFile.fromFile(
+            localImagePath,
+            filename: fileName,
+          );
+        }
       }
 
       final formData = FormData.fromMap(formDataMap);
@@ -82,10 +94,21 @@ class MenuRepository {
 
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
-        formDataMap['image'] = await MultipartFile.fromFile(
-          localImagePath,
-          filename: fileName,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            localImagePath,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          formDataMap['image'] = MultipartFile.fromBytes(
+            response.data!,
+            filename: fileName,
+          );
+        } else {
+          formDataMap['image'] = await MultipartFile.fromFile(
+            localImagePath,
+            filename: fileName,
+          );
+        }
       }
 
       final formData = FormData.fromMap(formDataMap);
@@ -122,10 +145,21 @@ class MenuRepository {
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
-        formDataMap['image'] = await MultipartFile.fromFile(
-          localImagePath,
-          filename: fileName,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            localImagePath,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          formDataMap['image'] = MultipartFile.fromBytes(
+            response.data!,
+            filename: fileName,
+          );
+        } else {
+          formDataMap['image'] = await MultipartFile.fromFile(
+            localImagePath,
+            filename: fileName,
+          );
+        }
       }
 
       final formData = FormData.fromMap(formDataMap);
@@ -168,10 +202,21 @@ class MenuRepository {
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
         final fileName = localImagePath.split('/').last;
-        formDataMap['image'] = await MultipartFile.fromFile(
-          localImagePath,
-          filename: fileName,
-        );
+        if (kIsWeb) {
+          final response = await Dio().get<List<int>>(
+            localImagePath,
+            options: Options(responseType: ResponseType.bytes),
+          );
+          formDataMap['image'] = MultipartFile.fromBytes(
+            response.data!,
+            filename: fileName,
+          );
+        } else {
+          formDataMap['image'] = await MultipartFile.fromFile(
+            localImagePath,
+            filename: fileName,
+          );
+        }
       }
 
       final formData = FormData.fromMap(formDataMap);

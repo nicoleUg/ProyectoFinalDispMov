@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -163,7 +164,9 @@ class _NuevoProductoAppAdminState extends State<NuevoProductoAppAdmin> {
                                   ),
                                   image: _localImagePath != null
                                       ? DecorationImage(
-                                          image: FileImage(File(_localImagePath!)),
+                                          image: kIsWeb
+                                              ? NetworkImage(_localImagePath!)
+                                              : FileImage(File(_localImagePath!)) as ImageProvider,
                                           fit: BoxFit.cover,
                                         )
                                       : null,
