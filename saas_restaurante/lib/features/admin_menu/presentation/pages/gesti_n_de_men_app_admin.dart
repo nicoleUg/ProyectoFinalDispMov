@@ -385,12 +385,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
               label: 'Eliminar',
               onPressed: () {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Producto "${product.name}" eliminado con éxito'),
-                    backgroundColor: RSColors.error,
-                  ),
-                );
+                context.read<AdminMenuBloc>().add(DeleteProductRequested(product.id));
               },
               size: RSButtonSize.small,
             ),

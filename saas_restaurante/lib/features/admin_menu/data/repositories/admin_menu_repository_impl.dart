@@ -47,4 +47,50 @@ class AdminMenuRepositoryImpl implements AdminMenuRepository {
       localImagePath: localImagePath,
     );
   }
+
+  @override
+  Future<void> updateProduct({
+    required String productId,
+    required String categoryId,
+    required String name,
+    required String description,
+    required double price,
+    required String? localImagePath,
+    required bool isAvailable,
+  }) async {
+    await menuRepository.updateProductWithImage(
+      productId: productId,
+      categoryId: categoryId,
+      name: name,
+      description: description,
+      price: price,
+      localImagePath: localImagePath,
+      isAvailable: isAvailable,
+    );
+  }
+
+  @override
+  Future<void> deleteProduct(String productId) async {
+    await menuRepository.deleteProduct(productId);
+  }
+
+  @override
+  Future<void> updateCategory({
+    required String categoryId,
+    required String name,
+    required int orderIndex,
+    required String? localImagePath,
+  }) async {
+    await menuRepository.updateCategoryWithImage(
+      categoryId: categoryId,
+      name: name,
+      orderIndex: orderIndex,
+      localImagePath: localImagePath,
+    );
+  }
+
+  @override
+  Future<void> deleteCategory(String categoryId) async {
+    await menuRepository.deleteCategory(categoryId);
+  }
 }

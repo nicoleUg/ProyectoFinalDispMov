@@ -98,5 +98,103 @@ class MenuRepository {
       throw Exception('No se pudo crear la categoría');
     }
   }
+
+  Future<void> updateProductWithImage({
+    required String productId,
+    required String categoryId,
+    required String name,
+    required String description,
+    required double price,
+    required String? localImagePath,
+    required bool isAvailable,
+  }) async {
+    try {
+      final Map<String, dynamic> formDataMap = {
+        'categoryId': categoryId,
+        'name': name,
+        'description': description,
+        'price': price.toString(),
+        'isAvailable': isAvailable.toString(),
+      };
+      if (localImagePath != null && localImagePath.isNotEmpty) {
+        final fileName = localImagePath.split('/').last;
+        formDataMap['image'] = await MultipartFile.fromFile(
+          localImagePath,
+          filename: fileName,
+        );
+      }
+
+      final formData = FormData.fromMap(formDataMap);
+      final response = await apiClient.dio.patch(
+        '/menu/products/$productId',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Producto actualizado con éxito: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error al actualizar producto: ${e.message}');
+      throw Exception('No se pudo actualizar el producto');
+    }
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    try {
+      final response = await apiClient.dio.delete('/menu/products/$productId');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Producto eliminado con éxito: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error al eliminar producto: ${e.message}');
+      throw Exception('No se pudo eliminar el producto');
+    }
+  }
+
+  Future<void> updateCategoryWithImage({
+    required String categoryId,
+    required String name,
+    required int orderIndex,
+    required String? localImagePath,
+  }) async {
+    try {
+      final Map<String, dynamic> formDataMap = {
+        'name': name,
+        'orderIndex': orderIndex.toString(),
+      };
+      if (localImagePath != null && localImagePath.isNotEmpty) {
+        final fileName = localImagePath.split('/').last;
+        formDataMap['image'] = await MultipartFile.fromFile(
+          localImagePath,
+          filename: fileName,
+        );
+      }
+
+      final formData = FormData.fromMap(formDataMap);
+      final response = await apiClient.dio.patch(
+        '/menu/categories/$categoryId',
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Categoría actualizada con éxito: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error al actualizar categoría: ${e.message}');
+      throw Exception('No se pudo actualizar la categoría');
+    }
+  }
+
+  Future<void> deleteCategory(String categoryId) async {
+    try {
+      final response = await apiClient.dio.delete('/menu/categories/$categoryId');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Categoría eliminada con éxito: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error al eliminar categoría: ${e.message}');
+      throw Exception('No se pudo eliminar la categoría');
+    }
+  }
 }
 

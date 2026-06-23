@@ -66,3 +66,12 @@ class UpdateProductRequested extends AdminMenuEvent {
   List<Object?> get props => [productId, categoryId, name, description, price, localImagePath, isAvailable];
 }
 
+class DeleteProductRequested extends AdminMenuEvent {
+  final String productId;
+
+  const DeleteProductRequested(this.productId);
+
+  @override
+  List<Object?> get props => [productId];
+}
+

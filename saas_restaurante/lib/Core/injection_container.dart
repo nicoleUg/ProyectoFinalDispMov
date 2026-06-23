@@ -14,6 +14,8 @@ import '../../features/admin_menu/domain/usecases/get_categories_usecase.dart';
 import '../../features/admin_menu/domain/usecases/get_products_by_category_usecase.dart';
 import '../../features/admin_menu/domain/usecases/create_category_usecase.dart';
 import '../../features/admin_menu/domain/usecases/create_product_usecase.dart';
+import '../../features/admin_menu/domain/usecases/update_product_usecase.dart';
+import '../../features/admin_menu/domain/usecases/delete_product_usecase.dart';
 import '../../features/orders/domain/repositories/order_repository.dart';
 import '../../features/orders/data/datasources/orders_local_datasource.dart';
 import '../../features/orders/data/datasources/orders_remote_datasource.dart';
@@ -71,6 +73,8 @@ Future<void> init() async {
         getProductsByCategoryUseCase: sl(),
         createCategoryUseCase: sl(),
         createProductUseCase: sl(),
+        updateProductUseCase: sl(),
+        deleteProductUseCase: sl(),
       ));
 
   // Admin Menu
@@ -79,6 +83,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetProductsByCategoryUseCase(sl()));
   sl.registerLazySingleton(() => CreateCategoryUseCase(sl()));
   sl.registerLazySingleton(() => CreateProductUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProductUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProductUseCase(sl()));
 
   sl.registerFactory(() => AdminOrdersBloc(
         getAdminOrdersUseCase: sl(),

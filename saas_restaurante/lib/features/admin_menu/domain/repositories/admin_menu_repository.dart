@@ -16,4 +16,21 @@ abstract class AdminMenuRepository {
     required double price,
     required String? localImagePath,
   });
+  Future<void> updateProduct({
+    required String productId,
+    required String categoryId,
+    required String name,
+    required String description,
+    required double price,
+    required String? localImagePath,
+    required bool isAvailable,
+  });
+  Future<void> deleteProduct(String productId);
+  Future<void> updateCategory({
+    required String categoryId,
+    required String name,
+    required int orderIndex,
+    required String? localImagePath,
+  });
+  Future<void> deleteCategory(String categoryId);
 }
