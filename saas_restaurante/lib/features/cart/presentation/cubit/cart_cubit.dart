@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/cart_item_entity.dart';
-import '../../domain/usecases/add_to_cart_usecase.dart';
-import '../../domain/usecases/get_cart_items_usecase.dart';
-import '../../domain/usecases/update_cart_quantity_usecase.dart';
+import '../../domain/usescases/add_to_cart_usecase.dart';
+import '../../domain/usescases/get_cart_items_usecase.dart';
+import '../../domain/usescases/update_cart_quantity_usecase.dart';
 
 class CartState {
   final List<CartItemEntity> items;

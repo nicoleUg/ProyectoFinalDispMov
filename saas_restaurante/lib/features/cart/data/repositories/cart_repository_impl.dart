@@ -1,6 +1,6 @@
 import '../../domain/entities/cart_item_entity.dart';
 import '../../domain/repositories/cart_repository.dart';
-import '../datasource/cart_local_datasource.dart';
+import '../datasources/cart_local_datasource.dart';
 import '../../../../Core/database/app_database.dart';
 import 'package:drift/drift.dart';
 

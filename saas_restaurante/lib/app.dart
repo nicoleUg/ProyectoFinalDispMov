@@ -4,6 +4,8 @@ import 'Core/injection_container.dart' as di;
 import 'Core/router/app_router.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/cart/presentation/cubit/cart_cubit.dart';
+import 'features/menu/presentation/blocs/menu_bloc.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -17,6 +19,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<CartCubit>(
           create: (context) => di.sl<CartCubit>()..loadCart(),
+        ),
+        BlocProvider<MenuBloc>(
+          create: (context) => di.sl<MenuBloc>(),
         ),
       ],
       child: MaterialApp.router(

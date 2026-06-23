@@ -138,7 +138,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildNode(Icons.check, 'Received', true, isActive: !isPreparing && !isReady),
-                _buildNode(Icons.skillet, 'Preparing', isPreparing || isReady, isActive: isPreparing),
+                _buildNode(Icons.restaurant, 'Preparing', isPreparing || isReady, isActive: isPreparing),
                 _buildNode(Icons.directions_bike, 'Ready', isReady, isActive: isReady),
               ],
             ),

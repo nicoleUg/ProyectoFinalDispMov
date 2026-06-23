@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
 import '../../domain/entities/order_entity.dart';
 import '../../domain/repositories/order_repository.dart';
-import '../datasource/orders_local_datasource.dart';
-import '../datasource/orders_remote_datasource.dart';
+import '../datasources/orders_local_datasource.dart';
+import '../datasources/orders_remote_datasource.dart';
 import '../../../../Core/database/app_database.dart';
 
 class OrderRepositoryImpl implements OrderRepository {

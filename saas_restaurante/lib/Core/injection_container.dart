@@ -5,19 +5,20 @@ import 'secure_storage/secure_storage_service.dart';
 import 'network/api_client.dart';
 import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/menu/data/datasource/menu_local_datasource.dart';
-import '../../features/menu/data/datasource/menu_remote_datasource.dart';
-import '../../features/menu/data/repositories/menu_repository_impl.dart';
-import '../../features/menu/domain/repositories/menu_repository.dart';
-import '../../features/menu/domain/usecases/get_local_categories_usecase.dart';
-import '../../features/menu/domain/usecases/get_local_products_usecase.dart';
-import '../../features/menu/domain/usecases/sync_menu_usecase.dart';
-import '../../features/menu/presentation/bloc/menu_bloc.dart';
+import '../../features/menu/data/repositories/menu_repository.dart';
+import '../../features/menu/presentation/blocs/menu_bloc.dart';
 import '../../features/orders/domain/repositories/order_repository.dart';
-import '../../features/orders/data/datasource/orders_local_datasource.dart';
-import '../../features/orders/data/datasource/orders_remote_datasource.dart';
+import '../../features/orders/data/datasources/orders_local_datasource.dart';
+import '../../features/orders/data/datasources/orders_remote_datasource.dart';
 import '../../features/orders/data/repositories/orders_repository_impl.dart';
 import '../../features/orders/presentation/bloc/orders_bloc.dart';
+import '../../features/cart/presentation/cubit/cart_cubit.dart';
+import '../../features/cart/domain/usescases/add_to_cart_usecase.dart';
+import '../../features/cart/domain/usescases/get_cart_items_usecase.dart';
+import '../../features/cart/domain/usescases/update_cart_quantity_usecase.dart';
+import '../../features/cart/domain/repositories/cart_repository.dart';
+import '../../features/cart/data/repositories/cart_repository_impl.dart';
+import '../../features/cart/data/datasources/cart_local_datasource.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -36,21 +37,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AuthRepository(sl(), sl()));
 
   sl.registerFactory(() => MenuBloc(
-        getCategories: sl(),
-        getProducts: sl(),
-        syncMenu: sl(),
+        menuRepository: sl(),
       ));
 
-  sl.registerLazySingleton(() => GetLocalCategoriesUseCase(sl()));
-  sl.registerLazySingleton(() => GetLocalProductsUseCase(sl()));
-  sl.registerLazySingleton(() => SyncMenuUseCase(sl()));
-
-  sl.registerLazySingleton<MenuRepository>(
-    () => MenuRepositoryImpl(localDataSource: sl(), remoteDataSource: sl())
-  );
-
-  sl.registerLazySingleton<MenuRemoteDataSource>(() => MenuRemoteDataSourceImpl(sl()));
-  sl.registerLazySingleton<MenuLocalDataSource>(() => MenuLocalDataSourceImpl(sl()));
+  sl.registerLazySingleton(() => MenuRepository(sl()));
   sl.registerFactory(() => CartCubit(
     addToCartUseCase: sl(),
     getCartItemsUseCase: sl(),
@@ -59,7 +49,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => AddToCartUseCase(sl()));
   sl.registerLazySingleton(() => GetCartItemsUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateQuantityUseCase(sl())); 
+  sl.registerLazySingleton(() => UpdateCartQuantityUseCase(sl())); 
 
   sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
   sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));

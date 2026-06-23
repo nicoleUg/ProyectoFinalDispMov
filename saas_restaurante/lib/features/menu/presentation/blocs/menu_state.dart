@@ -9,6 +9,8 @@ abstract class MenuState extends Equatable {
   List<Object?> get props => [];
 }
 
+class MenuInitial extends MenuState {}
+
 class MenuLoading extends MenuState {}
 
 class MenuLoaded extends MenuState {

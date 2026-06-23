@@ -61,4 +61,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(const AuthError('Error al registrar: Es posible que el correo ya esté en uso.'));
     }
+  }
 }

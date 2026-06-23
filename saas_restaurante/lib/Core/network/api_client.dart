@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'dart:io' show Platform;
+import 'dart:convert';
 import '../constants/api_constants.dart';
 import 'auth_interceptor.dart';
 import '../secure_storage/secure_storage_service.dart';
@@ -21,6 +22,9 @@ class ApiClient {
         baseUrl: baseUrl,
         connectTimeout: ApiConstants.connectTimeout,
         receiveTimeout: ApiConstants.receiveTimeout,
+        responseDecoder: (bytes, options, responseBody) {
+          return utf8.decode(bytes, allowMalformed: true);
+        },
       ),
     );
 
