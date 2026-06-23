@@ -41,6 +41,9 @@ import '../../features/table_scanner/data/repositories/table_scanner_repository_
 import '../../features/reviews/presentation/bloc/reviews_bloc.dart';
 import '../../features/reviews/domain/repositories/reviews_repository.dart';
 import '../../features/reviews/data/repositories/reviews_repository_impl.dart';
+import '../../features/favorites/domain/repositories/favorites_repository.dart';
+import '../../features/favorites/data/repositories/favorites_repository_impl.dart';
+import '../../features/favorites/presentation/bloc/favorites_bloc.dart';
 final sl = GetIt.instance; 
 
 Future<void> init() async {
@@ -123,4 +126,8 @@ Future<void> init() async {
   // Reviews
   sl.registerLazySingleton<ReviewsRepository>(() => ReviewsRepositoryImpl(sl()));
   sl.registerFactory(() => ReviewsBloc(sl()));
+
+  // Favorites
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
+  sl.registerFactory(() => FavoritesBloc(sl()));
 }

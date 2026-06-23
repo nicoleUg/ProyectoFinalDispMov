@@ -62,18 +62,27 @@ class ReviewsTable extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
-@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable, OrdersTable, OrderItemsTable, ReviewsTable])
+class FavoritesTable extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get productId => text()();
+  DateTimeColumn get addedAt => dateTime()();
+}
+
+@DriftDatabase(tables: [CartItems, CategoriesTable, ProductsTable, OrdersTable, OrderItemsTable, ReviewsTable, FavoritesTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'restauranteX_db'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
       if (from < 4) {
         await m.createTable(reviewsTable);
+      }
+      if (from < 5) {
+        await m.createTable(favoritesTable);
       }
     },
   );
@@ -98,4 +107,28 @@ class AppDatabase extends _$AppDatabase {
     final total = reviews.fold<int>(0, (sum, r) => sum + r.rating);
     return total / reviews.length;
   }
+
+  // ── Favorites queries ──────────────────────────────────────────────────────
+
+  /// Agrega un producto a favoritos.
+  Future<int> addFavorite(String productId) =>
+      into(favoritesTable).insert(FavoritesTableCompanion.insert(
+        productId: productId,
+        addedAt: DateTime.now(),
+      ));
+
+  /// Remueve un producto de favoritos.
+  Future<int> removeFavorite(String productId) =>
+      (delete(favoritesTable)..where((f) => f.productId.equals(productId))).go();
+
+  /// Verifica si un producto está en favoritos.
+  Future<bool> isFavorite(String productId) async {
+    final query = select(favoritesTable)..where((f) => f.productId.equals(productId));
+    final result = await query.get();
+    return result.isNotEmpty;
+  }
+
+  /// Trae todos los favoritos guardados.
+  Future<List<FavoritesTableData>> getAllFavorites() =>
+      select(favoritesTable).get();
 }
