@@ -22,7 +22,11 @@ class MenuRepository {
     try {
       final response = await apiClient.dio.get('/menu/products/$categoryId');
       final List<dynamic> data = response.data;
-      return data.map((json) => ProductModel.fromJson(json)).toList();
+      return data.map((json) {
+        final Map<String, dynamic> map = Map<String, dynamic>.from(json);
+        map['categoryId'] ??= categoryId;
+        return ProductModel.fromJson(map);
+      }).toList();
     } catch (e) {
       throw Exception('Error al cargar los productos: $e');
     }
