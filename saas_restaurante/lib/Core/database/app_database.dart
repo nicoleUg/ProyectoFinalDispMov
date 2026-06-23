@@ -17,6 +17,7 @@ class OrdersTable extends Table {
   TextColumn get status => text()(); 
   DateTimeColumn get createdAt => dateTime()();
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+  IntColumn get tableNumber => integer().withDefault(const Constant(0))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -73,7 +74,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'restauranteX_db'));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -83,6 +84,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.createTable(favoritesTable);
+      }
+      if (from < 6) {
+        await m.addColumn(ordersTable, ordersTable.tableNumber);
       }
     },
   );

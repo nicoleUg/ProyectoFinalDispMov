@@ -19,6 +19,7 @@ class OrderRepositoryImpl implements OrderRepository {
       status: Value(order.status),
       createdAt: Value(order.createdAt),
       isSynced: const Value(false),
+      tableNumber: Value(order.tableNumber),
     );
 
     final itemsCompanions = order.items.map((i) => OrderItemsTableCompanion(
@@ -47,7 +48,8 @@ class OrderRepositoryImpl implements OrderRepository {
 
       domainOrders.add(OrderEntity(
         id: o.id, total: o.total, status: o.status, 
-        createdAt: o.createdAt, items: items, isSynced: o.isSynced
+        createdAt: o.createdAt, items: items, isSynced: o.isSynced,
+        tableNumber: o.tableNumber,
       ));
     }
     return domainOrders;
@@ -59,7 +61,10 @@ class OrderRepositoryImpl implements OrderRepository {
     for (var o in pending) {
       final localItems = await localDataSource.getItemsForOrder(o.id);
       final success = await remoteDataSource.sendOrderToServer({
-        'id': o.id, 'total': o.total, 'status': o.status,
+        'id': o.id,
+        'total': o.total,
+        'status': o.status,
+        'tableNumber': o.tableNumber,
         'items': localItems.map((i) => {'name': i.productName, 'qty': i.quantity}).toList()
       });
       if (success) {
@@ -70,7 +75,10 @@ class OrderRepositoryImpl implements OrderRepository {
 
   void _trySyncSingleOrder(OrderEntity order) async {
     final success = await remoteDataSource.sendOrderToServer({
-      'id': order.id, 'total': order.total, 'status': order.status,
+      'id': order.id,
+      'total': order.total,
+      'status': order.status,
+      'tableNumber': order.tableNumber,
       'items': order.items.map((i) => {'name': i.productName, 'qty': i.quantity}).toList()
     });
 

@@ -119,7 +119,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton<CartRepository>(() => CartRepositoryImpl(sl()));
   sl.registerLazySingleton<CartLocalDataSource>(() => CartLocalDataSourceImpl(sl()));
-  sl.registerFactory(() => OrdersBloc(sl()));
+  sl.registerFactory(() => OrdersBloc(sl(), sl()));
   
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(localDataSource: sl(), remoteDataSource: sl())
