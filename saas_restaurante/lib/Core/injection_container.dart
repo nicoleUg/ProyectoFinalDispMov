@@ -7,6 +7,13 @@ import '../../features/auth/data/repositories/auth_repository.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/menu/data/repositories/menu_repository.dart';
 import '../../features/menu/presentation/blocs/menu_bloc.dart';
+import '../../features/admin_menu/presentation/bloc/admin_menu_bloc.dart';
+import '../../features/admin_menu/domain/repositories/admin_menu_repository.dart';
+import '../../features/admin_menu/data/repositories/admin_menu_repository_impl.dart';
+import '../../features/admin_menu/domain/usecases/get_categories_usecase.dart';
+import '../../features/admin_menu/domain/usecases/get_products_by_category_usecase.dart';
+import '../../features/admin_menu/domain/usecases/create_category_usecase.dart';
+import '../../features/admin_menu/domain/usecases/create_product_usecase.dart';
 import '../../features/orders/domain/repositories/order_repository.dart';
 import '../../features/orders/data/datasources/orders_local_datasource.dart';
 import '../../features/orders/data/datasources/orders_remote_datasource.dart';
@@ -39,6 +46,20 @@ Future<void> init() async {
   sl.registerFactory(() => MenuBloc(
         menuRepository: sl(),
       ));
+
+  sl.registerFactory(() => AdminMenuBloc(
+        getCategoriesUseCase: sl(),
+        getProductsByCategoryUseCase: sl(),
+        createCategoryUseCase: sl(),
+        createProductUseCase: sl(),
+      ));
+
+  // Admin Menu
+  sl.registerLazySingleton<AdminMenuRepository>(() => AdminMenuRepositoryImpl(menuRepository: sl()));
+  sl.registerLazySingleton(() => GetCategoriesUseCase(sl()));
+  sl.registerLazySingleton(() => GetProductsByCategoryUseCase(sl()));
+  sl.registerLazySingleton(() => CreateCategoryUseCase(sl()));
+  sl.registerLazySingleton(() => CreateProductUseCase(sl()));
 
   sl.registerLazySingleton(() => MenuRepository(sl()));
   sl.registerFactory(() => CartCubit(
