@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../blocs/menu_bloc.dart';
 import '../blocs/menu_event.dart';
 import '../blocs/menu_state.dart';
@@ -34,6 +35,11 @@ class _MenuPageState extends State<MenuPage> {
         foregroundColor: primaryColor,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner_rounded),
+            tooltip: 'Escanear Mesa',
+            onPressed: () => context.go('/scanner'),
+          ),
           IconButton(
             icon: const Icon(Icons.link),
             tooltip: 'Simular Deeplink',

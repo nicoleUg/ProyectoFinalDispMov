@@ -13,10 +13,19 @@ class MainLayout extends StatelessWidget {
     final primaryContainer = const Color(0xFFFF5722);
 
     return Scaffold(
-      body: child, 
+      body: child,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.go('/scanner'),
+        backgroundColor: primary,
+        foregroundColor: Colors.white,
+        tooltip: 'Escanear QR de mesa',
+        elevation: 4,
+        child: const Icon(Icons.qr_code_scanner_rounded, size: 28),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF3F4F5), 
+          color: const Color(0xFFF3F4F5),
           boxShadow: [
             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -2))
           ],
@@ -35,21 +44,14 @@ class MainLayout extends StatelessWidget {
                   activeColor: primaryContainer,
                   onTap: () => context.go('/'),
                 ),
+                // Espacio para el FAB central
+                const SizedBox(width: 64),
                 _NavItem(
                   icon: Icons.receipt_long,
-                  label: 'Orders',
+                  label: 'Pedidos',
                   isActive: location.startsWith('/orders'),
                   activeColor: primaryContainer,
                   onTap: () => context.go('/orders'),
-                ),
-                _NavItem(
-                  icon: Icons.person,
-                  label: 'Profile',
-                  isActive: location.startsWith('/profile'),
-                  activeColor: primaryContainer,
-                  onTap: () {
-                    // módulo de perfil
-                  },
                 ),
               ],
             ),
