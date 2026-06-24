@@ -16,6 +16,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   }
 
   Future<void> _onConfirmOrderRequested(ConfirmOrderRequested event, Emitter<OrdersState> emit) async {
+    if (state is OrdersLoading) return; // Evitar confirmaciones duplicadas por doble toque rápido.
     emit(OrdersLoading());
     try {
       final orderId = const Uuid().v4();
@@ -31,7 +32,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       final newOrder = OrderEntity(
         id: orderId,
         total: event.total,
-        status: 'preparing', 
+        status: 'pending', 
         createdAt: DateTime.now(),
         items: orderItems,
         tableNumber: tableNumber,

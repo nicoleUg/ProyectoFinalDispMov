@@ -277,7 +277,7 @@ class _GestiNDeMenAppAdminState extends State<GestiNDeMenAppAdmin> {
                         ),
                       ),
                       Text(
-                        '\$${product.price.toStringAsFixed(2)}',
+                        'Bs. ${product.price.toStringAsFixed(2)}',
                         style: RSTypography.titleMedium.copyWith(
                           color: isAvailable ? RSColors.primary : Colors.grey,
                         ),

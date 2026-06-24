@@ -16,10 +16,11 @@ class AuthInterceptor extends Interceptor {
     
     if (options.data is FormData) {
       options.headers.remove('Content-Type');
+      options.headers.remove('content-type');
     } else {
-      options.headers['Content-Type'] = 'application/json';
+      options.headers['content-type'] = 'application/json';
     }
-    options.headers['Accept'] = 'application/json';
+    options.headers['accept'] = 'application/json';
     
     return handler.next(options);
   }

@@ -88,7 +88,7 @@ class CartItemTile extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '\$${item.price.toStringAsFixed(2)}',
+                                  'Bs. ${item.price.toStringAsFixed(2)}',
                                   style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
                               ],

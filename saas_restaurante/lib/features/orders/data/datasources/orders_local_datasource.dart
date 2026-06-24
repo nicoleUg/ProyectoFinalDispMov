@@ -7,6 +7,7 @@ abstract class OrdersLocalDataSource {
   Future<List<OrderItemsTableData>> getItemsForOrder(String orderId);
   Future<List<OrdersTableData>> getUnsyncedOrders();
   Future<void> markAsSynced(String orderId);
+  Future<void> updateOrderStatus(String orderId, String status);
   Future<void> clearCartTable();
 }
 
@@ -44,6 +45,12 @@ class OrdersLocalDataSourceImpl implements OrdersLocalDataSource {
   Future<void> markAsSynced(String orderId) async {
     await (db.update(db.ordersTable)..where((t) => t.id.equals(orderId)))
         .write(const OrdersTableCompanion(isSynced: Value(true)));
+  }
+
+  @override
+  Future<void> updateOrderStatus(String orderId, String status) async {
+    await (db.update(db.ordersTable)..where((t) => t.id.equals(orderId)))
+        .write(OrdersTableCompanion(status: Value(status)));
   }
 
   @override

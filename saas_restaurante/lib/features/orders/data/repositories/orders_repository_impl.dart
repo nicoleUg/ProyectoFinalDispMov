@@ -41,14 +41,32 @@ class OrderRepositoryImpl implements OrderRepository {
     List<OrderEntity> domainOrders = [];
 
     for (var o in localOrders) {
+      String currentStatus = o.status;
+      // Sólo sincronizar el estado desde el servidor si no está entregado localmente.
+      if (o.status != 'delivered') {
+        try {
+          final remoteStatus = await remoteDataSource.getOrderStatus(o.id);
+          if (remoteStatus != null && remoteStatus != o.status) {
+            await localDataSource.updateOrderStatus(o.id, remoteStatus);
+            currentStatus = remoteStatus;
+          }
+        } catch (e) {
+          print('Error al sincronizar estado del pedido ${o.id}: $e');
+        }
+      }
+
       final localItems = await localDataSource.getItemsForOrder(o.id);
       final items = localItems.map((i) => OrderItemEntity(
         productName: i.productName, quantity: i.quantity
       )).toList();
 
       domainOrders.add(OrderEntity(
-        id: o.id, total: o.total, status: o.status, 
-        createdAt: o.createdAt, items: items, isSynced: o.isSynced,
+        id: o.id,
+        total: o.total,
+        status: currentStatus, 
+        createdAt: o.createdAt,
+        items: items,
+        isSynced: o.isSynced,
         tableNumber: o.tableNumber,
       ));
     }

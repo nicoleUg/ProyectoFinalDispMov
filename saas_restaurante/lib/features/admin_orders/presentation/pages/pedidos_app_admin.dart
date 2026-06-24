@@ -283,7 +283,9 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
               Row(
                 children: [
                   Text(
-                    'Mesa #${order.id.substring(order.id.length - 3).toUpperCase()}',
+                    order.tableNumber > 0
+                        ? 'Mesa #${order.tableNumber}'
+                        : 'Pedido #${order.id.substring(order.id.length - 6).toUpperCase()}',
                     style: RSTypography.titleSmall.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -347,7 +349,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Total: \$${order.total.toStringAsFixed(2)}',
+                'Total: Bs. ${order.total.toStringAsFixed(2)}',
                 style: RSTypography.titleSmall.copyWith(
                   color: RSColors.primary,
                   fontWeight: FontWeight.bold,
@@ -473,7 +475,7 @@ class _PedidosAppAdminState extends State<PedidosAppAdmin> {
           children: [
             const Icon(Icons.info_outline, color: Colors.white),
             const SizedBox(width: 8),
-            Text('Pedido #${orderId.substring(orderId.length - 3).toUpperCase()} movido a $statusLabel'),
+            Text('Pedido #${orderId.substring(orderId.length - 6).toUpperCase()} movido a $statusLabel'),
           ],
         ),
         backgroundColor: status == 'ready' 
