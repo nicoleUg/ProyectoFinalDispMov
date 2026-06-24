@@ -5,6 +5,7 @@ import 'package:restaurantesaas_design_system/restaurantesaas_design_system.dart
 import '../blocs/menu_bloc.dart';
 import '../blocs/menu_event.dart';
 import '../blocs/menu_state.dart';
+import '../../data/repositories/menu_repository.dart';
 import '../../../cart/presentation/cubit/cart_cubit.dart';
 import '../../../cart/domain/entities/cart_item_entity.dart';
 import '../../domain/entities/product_entity.dart';
@@ -29,6 +30,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;
+
+  ProductEntity? _fallbackProduct;
+  bool _loadingFallback = false;
 
   @override
   void initState() {
@@ -56,6 +60,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   ProductEntity? _findProduct(MenuState state) {
+    if (_fallbackProduct != null) return _fallbackProduct;
     if (state is MenuLoaded) {
       try {
         return state.products.firstWhere((p) => p.id == widget.productId);
@@ -64,6 +69,37 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       }
     }
     return null;
+  }
+
+  Future<void> _loadFallbackProduct(List<dynamic> categories, String selectedCategoryId) async {
+    if (!mounted) return;
+    setState(() {
+      _loadingFallback = true;
+    });
+    try {
+      final repo = di.sl<MenuRepository>();
+      for (final cat in categories) {
+        if (cat.id == selectedCategoryId) continue;
+        final products = await repo.getProductsByCategory(cat.id);
+        final matches = products.where((p) => p.id == widget.productId);
+        if (matches.isNotEmpty) {
+          if (mounted) {
+            setState(() {
+              _fallbackProduct = matches.first;
+              _loadingFallback = false;
+            });
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      print('[ProductDetailPage] Error al buscar producto de respaldo: $e');
+    }
+    if (mounted) {
+      setState(() {
+        _loadingFallback = false;
+      });
+    }
   }
 
   @override
@@ -83,6 +119,18 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             final product = _findProduct(state);
 
             if (product == null) {
+              if (state is MenuLoaded && !_loadingFallback && _fallbackProduct == null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _loadFallbackProduct(state.categories, state.selectedCategoryId);
+                });
+              }
+
+              if (_loadingFallback) {
+                return const Center(
+                  child: CircularProgressIndicator(color: RSColors.primary),
+                );
+              }
+
               return _buildNotFound(context);
             }
 

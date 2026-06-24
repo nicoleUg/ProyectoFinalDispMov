@@ -113,8 +113,8 @@ class _DashboardAppAdminState extends State<DashboardAppAdmin> {
   Widget _buildSummaryCards() {
     return BlocBuilder<AdminReportsBloc, AdminReportsState>(
       builder: (context, state) {
-        double earnings = 1645.0;
-        int orders = 153;
+        double earnings = 0.0;
+        int orders = 0;
 
         if (state is AdminReportsLoaded) {
           earnings = state.reportData.totalEarnings;
@@ -129,7 +129,7 @@ class _DashboardAppAdminState extends State<DashboardAppAdmin> {
             final children = [
               _buildStatCard(
                 'Ingresos de Hoy',
-                '\$${earnings.toStringAsFixed(2)}',
+                'Bs. ${earnings.toStringAsFixed(2)}',
                 Icons.monetization_on,
                 const Color(0xFF1B5E20),
                 isTooNarrow ? double.infinity : cardWidth,
@@ -143,7 +143,7 @@ class _DashboardAppAdminState extends State<DashboardAppAdmin> {
               ),
               _buildStatCard(
                 'Ticket Promedio',
-                '\$${orders > 0 ? (earnings / orders).toStringAsFixed(2) : "0.00"}',
+                'Bs. ${orders > 0 ? (earnings / orders).toStringAsFixed(2) : "0.00"}',
                 Icons.analytics,
                 const Color(0xFFE65100),
                 isTooNarrow ? double.infinity : cardWidth,

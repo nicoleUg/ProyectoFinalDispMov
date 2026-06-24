@@ -7,7 +7,23 @@ abstract class AdminMenuEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadAdminMenuRequested extends AdminMenuEvent {}
+class LoadAdminMenuRequested extends AdminMenuEvent {
+  final String? selectedCategoryId;
+  
+  const LoadAdminMenuRequested({this.selectedCategoryId});
+  
+  @override
+  List<Object?> get props => [selectedCategoryId];
+}
+
+class AdminCategorySelected extends AdminMenuEvent {
+  final String categoryId;
+  
+  const AdminCategorySelected(this.categoryId);
+  
+  @override
+  List<Object?> get props => [categoryId];
+}
 
 class AddCategoryRequested extends AdminMenuEvent {
   final String name;
@@ -74,4 +90,3 @@ class DeleteProductRequested extends AdminMenuEvent {
   @override
   List<Object?> get props => [productId];
 }
-

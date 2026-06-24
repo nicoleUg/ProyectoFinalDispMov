@@ -29,7 +29,14 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     Emitter<FavoritesState> emit,
   ) async {
     try {
-      final isFav = await _repository.isFavorite(event.productId);
+      bool isFav = false;
+      final currentState = state;
+      if (currentState is FavoritesLoaded) {
+        isFav = currentState.favorites.any((f) => f.productId == event.productId);
+      } else {
+        isFav = await _repository.isFavorite(event.productId);
+      }
+
       if (isFav) {
         await _repository.removeFavorite(event.productId);
       } else {

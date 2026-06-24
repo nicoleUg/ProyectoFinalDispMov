@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import '../../../../Core/database/app_database.dart';
 import '../../../../Core/network/api_client.dart';
 import '../../domain/entities/report_data_entity.dart';
@@ -11,24 +12,57 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
 
   @override
   Future<ReportDataEntity> getReportData(String period) async {
-    // 1. Attempt to fetch from backend (optional status reporting)
+    // 1. Intentar sincronizar pedidos desde el backend remoto para asegurar datos reales
     try {
-      final response = await apiClient.dio.get('/reports/summary', queryParameters: {
-        'period': period,
-      });
-      // In a full implementation, we could parse backend JSON here.
-      // But for this project, we primarily rely on local SQLite transactions to support offline capabilities.
-      print('Sincronización de reportes desde el servidor recibida: ${response.statusCode}');
+      final response = await apiClient.dio.get('/orders');
+      final List<dynamic> data = response.data;
+      print('[AdminReportsRepository] Sincronizando ${data.length} pedidos desde el backend para reportes...');
+
+      for (var json in data) {
+        final orderId = json['id'] as String;
+        final total = (json['total'] as num).toDouble();
+        final status = json['status'] as String;
+        final tableNumber = json['tableNumber'] as int? ?? 0;
+        final createdAt = json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'] as String)
+            : DateTime.now();
+
+        // Guardar o actualizar pedido local
+        await db.into(db.ordersTable).insertOnConflictUpdate(OrdersTableCompanion(
+              id: Value(orderId),
+              total: Value(total),
+              status: Value(status),
+              createdAt: Value(createdAt),
+              isSynced: const Value(true),
+              tableNumber: Value(tableNumber),
+            ));
+
+        // Actualizar items locales para este pedido
+        await (db.delete(db.orderItemsTable)..where((t) => t.orderId.equals(orderId))).go();
+
+        final List<dynamic> itemsJson = json['items'] as List<dynamic>? ?? [];
+        for (var item in itemsJson) {
+          await db.into(db.orderItemsTable).insert(OrderItemsTableCompanion(
+                orderId: Value(orderId),
+                productName: Value(item['name'] as String),
+                quantity: Value(item['qty'] as int),
+              ));
+        }
+      }
     } catch (e) {
-      print('Sincronización remota de reportes omitida ($e). Usando agregación de base de datos local.');
+      print('[AdminReportsRepository] Sincronización remota de reportes omitida ($e). Usando agregación de base de datos local existente.');
     }
 
     // 2. Query all local orders
     final allOrders = await (db.select(db.ordersTable)).get();
     
-    // If there are no orders at all, return high-fidelity mock report metrics
     if (allOrders.isEmpty) {
-      return _getFallbackMockReport(period);
+      return ReportDataEntity(
+        totalEarnings: 0.0,
+        totalOrders: 0,
+        popularDishes: const [],
+        dailySales: const [],
+      );
     }
 
     // 3. Define cutoff date based on period
@@ -45,7 +79,12 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
     // 4. Filter orders
     final filteredOrders = allOrders.where((o) => o.createdAt.isAfter(cutoff)).toList();
     if (filteredOrders.isEmpty) {
-      return _getFallbackMockReport(period);
+      return ReportDataEntity(
+        totalEarnings: 0.0,
+        totalOrders: 0,
+        popularDishes: const [],
+        dailySales: const [],
+      );
     }
 
     // 5. Aggregate earnings & count
@@ -121,59 +160,6 @@ class AdminReportsRepositoryImpl implements AdminReportsRepository {
     return ReportDataEntity(
       totalEarnings: totalEarnings,
       totalOrders: totalOrdersCount,
-      popularDishes: popularDishes,
-      dailySales: dailySales,
-    );
-  }
-
-  ReportDataEntity _getFallbackMockReport(String period) {
-    // Return high-fidelity pre-filled mock report statistics
-    final List<PopularDishEntity> popularDishes = [
-      PopularDishEntity(name: 'Hamburguesa Doble Queso', quantitySold: 42, earnings: 504.0),
-      PopularDishEntity(name: 'Pizza Pepperoni Familiar', quantitySold: 28, earnings: 686.0),
-      PopularDishEntity(name: 'Papas Fritas Medianas', quantitySold: 35, earnings: 140.0),
-      PopularDishEntity(name: 'Ensalada César con Pollo', quantitySold: 18, earnings: 225.0),
-      PopularDishEntity(name: 'Jugo Natural Maracuyá', quantitySold: 30, earnings: 90.0),
-    ];
-
-    List<DailySaleEntity> dailySales = [];
-    double totalEarnings = 1645.0;
-    int totalOrders = 153;
-
-    if (period == 'today') {
-      totalEarnings = 425.0;
-      totalOrders = 35;
-      dailySales = [
-        DailySaleEntity(dayLabel: '08:00', salesAmount: 45.0),
-        DailySaleEntity(dayLabel: '12:00', salesAmount: 180.0),
-        DailySaleEntity(dayLabel: '16:00', salesAmount: 90.0),
-        DailySaleEntity(dayLabel: '20:00', salesAmount: 110.0),
-      ];
-    } else if (period == 'week') {
-      totalEarnings = 2850.0;
-      totalOrders = 240;
-      dailySales = [
-        DailySaleEntity(dayLabel: 'Lun', salesAmount: 320.0),
-        DailySaleEntity(dayLabel: 'Mar', salesAmount: 410.0),
-        DailySaleEntity(dayLabel: 'Mié', salesAmount: 350.0),
-        DailySaleEntity(dayLabel: 'Jue', salesAmount: 480.0),
-        DailySaleEntity(dayLabel: 'Vie', salesAmount: 620.0),
-        DailySaleEntity(dayLabel: 'Sáb', salesAmount: 670.0),
-      ];
-    } else {
-      // Month
-      dailySales = [
-        DailySaleEntity(dayLabel: '05 Jun', salesAmount: 1200.0),
-        DailySaleEntity(dayLabel: '10 Jun', salesAmount: 1500.0),
-        DailySaleEntity(dayLabel: '15 Jun', salesAmount: 1100.0),
-        DailySaleEntity(dayLabel: '20 Jun', salesAmount: 1800.0),
-        DailySaleEntity(dayLabel: '25 Jun', salesAmount: 2100.0),
-      ];
-    }
-
-    return ReportDataEntity(
-      totalEarnings: totalEarnings,
-      totalOrders: totalOrders,
       popularDishes: popularDishes,
       dailySales: dailySales,
     );

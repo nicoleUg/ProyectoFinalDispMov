@@ -44,106 +44,108 @@ class CartItemTile extends StatelessWidget {
             children: [
               Container(width: 4, color: primary),
               
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: surfaceContainer,
-                        borderRadius: BorderRadius.circular(8),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: surfaceContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: item.imageUrl != null && item.imageUrl!.isNotEmpty
+                            ? Image.network(item.imageUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.fastfood, color: Colors.grey))
+                            : const Icon(Icons.fastfood, color: Colors.grey),
                       ),
-                      clipBehavior: Clip.antiAlias,
-                      child: item.imageUrl != null
-                          ? Image.network(item.imageUrl!, fit: BoxFit.cover)
-                          : const Icon(Icons.fastfood, color: Colors.grey),
-                    ),
-                    const SizedBox(width: 16),
-                    
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.name,
-                                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                                    ),
-                                    Text(
-                                      'Añadido desde el menú', // Aquí iría la sub-descripción real
-                                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                '\$${item.price.toStringAsFixed(2)}',
-                                style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Botón Remover
-                              TextButton.icon(
-                                onPressed: onRemoved,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: error,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                icon: const Icon(Icons.delete_outline, size: 18),
-                                label: const Text('Remove', style: TextStyle(fontSize: 12)),
-                              ),
-                              
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: surfaceContainer,
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                padding: const EdgeInsets.all(4),
-                                child: Row(
-                                  children: [
-                                    _RoundIconButton(
-                                      icon: Icons.remove,
-                                      onPressed: () => onQuantityChanged(item.quantity - 1),
-                                    ),
-                                    SizedBox(
-                                      width: 32,
-                                      child: Text(
-                                        '${item.quantity}',
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      const SizedBox(width: 16),
+                      
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.name,
+                                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                                       ),
-                                    ),
-                                    _RoundIconButton(
-                                      icon: Icons.add,
-                                      color: primaryContainer,
-                                      iconColor: Colors.white,
-                                      onPressed: () => onQuantityChanged(item.quantity + 1),
-                                    ),
-                                  ],
+                                      Text(
+                                        'Añadido desde el menú', // Aquí iría la sub-descripción real
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                                Text(
+                                  'Bs. ${item.price.toStringAsFixed(2)}',
+                                  style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Botón Remover
+                                TextButton.icon(
+                                  onPressed: onRemoved,
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: error,
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  icon: const Icon(Icons.delete_outline, size: 18),
+                                  label: const Text('Remove', style: TextStyle(fontSize: 12)),
+                                ),
+                                
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: surfaceContainer,
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  padding: const EdgeInsets.all(4),
+                                  child: Row(
+                                    children: [
+                                      _RoundIconButton(
+                                        icon: Icons.remove,
+                                        onPressed: () => onQuantityChanged(item.quantity - 1),
+                                      ),
+                                      SizedBox(
+                                        width: 32,
+                                        child: Text(
+                                          '${item.quantity}',
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                      ),
+                                      _RoundIconButton(
+                                        icon: Icons.add,
+                                        color: primaryContainer,
+                                        iconColor: Colors.white,
+                                        onPressed: () => onQuantityChanged(item.quantity + 1),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],

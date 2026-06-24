@@ -231,6 +231,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
   Widget _buildOrderView(OrderEntity order) {
     final isPreparing = order.status == 'preparing';
     final isReady = order.status == 'ready';
+    final isDelivered = order.status == 'delivered';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -241,7 +242,7 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
             children: [
               _buildStatusHero(order.status),
               const SizedBox(height: 24),
-              _buildTimelineCard(isPreparing, isReady),
+              _buildTimelineCard(isPreparing, isReady, isDelivered),
               const SizedBox(height: 24),
               _buildOrderSummary(order),
               if (_isDeeplinkMode) ...[
@@ -315,24 +316,31 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
   Widget _buildStatusHero(String status) {
     final isReady = status == 'ready';
     final isPreparing = status == 'preparing';
+    final isDelivered = status == 'delivered';
 
-    String title = isReady
-        ? '¡Pedido Listo!'
-        : isPreparing
-            ? 'En Preparación'
-            : 'Pedido Recibido';
+    String title = isDelivered
+        ? 'Pedido Entregado'
+        : isReady
+            ? '¡Pedido Listo!'
+            : isPreparing
+                ? 'En Preparación'
+                : 'Pedido Recibido';
 
-    String subtitle = isReady
-        ? 'Tu pedido está listo para recoger.'
-        : isPreparing
-            ? 'El equipo está preparando tu pedido.'
-            : 'Hemos recibido tu pedido correctamente.';
+    String subtitle = isDelivered
+        ? 'Tu pedido ha sido entregado. ¡Gracias por tu preferencia!'
+        : isReady
+            ? 'Tu pedido está listo para recoger.'
+            : isPreparing
+                ? 'El equipo está preparando tu pedido.'
+                : 'Hemos recibido tu pedido correctamente.';
 
-    Color statusColor = isReady
-        ? const Color(0xFF1B5E20)
-        : isPreparing
-            ? const Color(0xFFE65100)
-            : RSColors.primary;
+    Color statusColor = isDelivered
+        ? const Color(0xFF2E7D32)
+        : isReady
+            ? const Color(0xFF1B5E20)
+            : isPreparing
+                ? const Color(0xFFE65100)
+                : RSColors.primary;
 
     return Container(
       height: 160,
@@ -364,7 +372,11 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
-                        isReady ? Icons.check_circle_rounded : Icons.restaurant_rounded,
+                        isDelivered
+                            ? Icons.local_shipping_rounded
+                            : isReady
+                                ? Icons.check_circle_rounded
+                                : Icons.restaurant_rounded,
                         color: Colors.white,
                         size: 22,
                       ),
@@ -399,8 +411,12 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
     );
   }
 
-  Widget _buildTimelineCard(bool isPreparing, bool isReady) {
-    double progress = isReady ? 1.0 : (isPreparing ? 0.5 : 0.1);
+  Widget _buildTimelineCard(bool isPreparing, bool isReady, bool isDelivered) {
+    double progress = isDelivered
+        ? 1.0
+        : isReady
+            ? 1.0
+            : (isPreparing ? 0.5 : 0.1);
 
     return RSCard(
       padding: const EdgeInsets.all(24),
@@ -433,9 +449,24 @@ class _OrderTrackingPageState extends State<OrderTrackingPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNode(Icons.check_rounded, 'Recibido', true, isActive: !isPreparing && !isReady),
-                  _buildNode(Icons.restaurant_rounded, 'Preparando', isPreparing || isReady, isActive: isPreparing),
-                  _buildNode(Icons.done_all_rounded, 'Listo', isReady, isActive: isReady),
+                  _buildNode(
+                    Icons.check_rounded,
+                    'Recibido',
+                    true,
+                    isActive: !isPreparing && !isReady && !isDelivered,
+                  ),
+                  _buildNode(
+                    Icons.restaurant_rounded,
+                    'Preparando',
+                    isPreparing || isReady || isDelivered,
+                    isActive: isPreparing,
+                  ),
+                  _buildNode(
+                    isDelivered ? Icons.local_shipping_rounded : Icons.done_all_rounded,
+                    isDelivered ? 'Entregado' : 'Listo',
+                    isReady || isDelivered,
+                    isActive: isReady || isDelivered,
+                  ),
                 ],
               ),
             ],

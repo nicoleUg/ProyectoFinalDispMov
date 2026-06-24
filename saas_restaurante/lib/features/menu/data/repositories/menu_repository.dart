@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:image_picker/image_picker.dart' show XFile;
 import '../../../../Core/network/api_client.dart';
 import '../models/category_model.dart';
 import '../models/product_model.dart';
@@ -48,14 +49,11 @@ class MenuRepository {
         'price': price.toString(),
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        final fileName = localImagePath.split('/').last;
+        final fileName = _getSafeFileName(localImagePath);
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -76,8 +74,9 @@ class MenuRepository {
         print('Producto creado con éxito con su imagen: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al subir producto e imagen: ${e.message}');
-      throw Exception('No se pudo crear el producto');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo crear el producto');
+      print('Error al subir producto e imagen: $errorMsg');
+      throw Exception(errorMsg);
     }
   }
 
@@ -93,14 +92,11 @@ class MenuRepository {
       };
 
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        final fileName = localImagePath.split('/').last;
+        final fileName = _getSafeFileName(localImagePath);
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -121,8 +117,9 @@ class MenuRepository {
         print('Categoría creada con éxito con su imagen: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al subir categoría e imagen: ${e.message}');
-      throw Exception('No se pudo crear la categoría');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo crear la categoría');
+      print('Error al subir categoría e imagen: $errorMsg');
+      throw Exception(errorMsg);
     }
   }
 
@@ -144,14 +141,11 @@ class MenuRepository {
         'isAvailable': isAvailable.toString(),
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        final fileName = localImagePath.split('/').last;
+        final fileName = _getSafeFileName(localImagePath);
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -172,8 +166,9 @@ class MenuRepository {
         print('Producto actualizado con éxito: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al actualizar producto: ${e.message}');
-      throw Exception('No se pudo actualizar el producto');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo actualizar el producto');
+      print('Error al actualizar producto: $errorMsg');
+      throw Exception(errorMsg);
     }
   }
 
@@ -184,8 +179,9 @@ class MenuRepository {
         print('Producto eliminado con éxito: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al eliminar producto: ${e.message}');
-      throw Exception('No se pudo eliminar el producto');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo eliminar el producto');
+      print('Error al eliminar producto: $errorMsg');
+      throw Exception(errorMsg);
     }
   }
 
@@ -201,14 +197,11 @@ class MenuRepository {
         'orderIndex': orderIndex.toString(),
       };
       if (localImagePath != null && localImagePath.isNotEmpty) {
-        final fileName = localImagePath.split('/').last;
+        final fileName = _getSafeFileName(localImagePath);
         if (kIsWeb) {
-          final response = await Dio().get<List<int>>(
-            localImagePath,
-            options: Options(responseType: ResponseType.bytes),
-          );
+          final bytes = await XFile(localImagePath).readAsBytes();
           formDataMap['image'] = MultipartFile.fromBytes(
-            response.data!,
+            bytes,
             filename: fileName,
           );
         } else {
@@ -229,8 +222,9 @@ class MenuRepository {
         print('Categoría actualizada con éxito: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al actualizar categoría: ${e.message}');
-      throw Exception('No se pudo actualizar la categoría');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo actualizar la categoría');
+      print('Error al actualizar categoría: $errorMsg');
+      throw Exception(errorMsg);
     }
   }
 
@@ -241,9 +235,37 @@ class MenuRepository {
         print('Categoría eliminada con éxito: ${response.data}');
       }
     } on DioException catch (e) {
-      print('Error al eliminar categoría: ${e.message}');
-      throw Exception('No se pudo eliminar la categoría');
+      final errorMsg = _getDioErrorMessage(e, 'No se pudo eliminar la categoría');
+      print('Error al eliminar categoría: $errorMsg');
+      throw Exception(errorMsg);
     }
+  }
+
+  String _getDioErrorMessage(DioException e, String defaultMessage) {
+    final responseData = e.response?.data;
+    String details = '';
+    if (responseData is Map && responseData.containsKey('message')) {
+      final msg = responseData['message'];
+      if (msg is List) {
+        details = ': ${msg.join(", ")}';
+      } else if (msg is String) {
+        details = ': $msg';
+      }
+    }
+    return '$defaultMessage$details';
+  }
+
+  String _getSafeFileName(String path) {
+    String fileName = path.split(RegExp(r'[/\\]')).last;
+    final lowercaseName = fileName.toLowerCase();
+    if (!lowercaseName.endsWith('.jpg') &&
+        !lowercaseName.endsWith('.jpeg') &&
+        !lowercaseName.endsWith('.png') &&
+        !lowercaseName.endsWith('.webp') &&
+        !lowercaseName.endsWith('.gif')) {
+      fileName = '$fileName.jpg';
+    }
+    return fileName;
   }
 }
 

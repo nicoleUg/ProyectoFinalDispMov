@@ -16,11 +16,14 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   }
 
   Future<void> _onConfirmOrderRequested(ConfirmOrderRequested event, Emitter<OrdersState> emit) async {
+    if (state is OrdersLoading) return; // Evitar confirmaciones duplicadas por doble toque rápido.
     emit(OrdersLoading());
     try {
       final orderId = const Uuid().v4();
       final tableId = await secureStorage.getTableId();
       final tableNumber = int.tryParse(tableId ?? '0') ?? 0;
+
+      print('[OrdersBloc] Confirmando pedido de mesa. tableId recuperado: "$tableId", tableNumber: $tableNumber');
 
       final orderItems = event.cartItems.map((c) => OrderItemEntity(
         productName: c.name,
@@ -29,7 +32,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       final newOrder = OrderEntity(
         id: orderId,
         total: event.total,
-        status: 'preparing', 
+        status: 'pending', 
         createdAt: DateTime.now(),
         items: orderItems,
         tableNumber: tableNumber,

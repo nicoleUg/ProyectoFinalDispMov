@@ -25,6 +25,7 @@ class AdminMenuBloc extends Bloc<AdminMenuEvent, AdminMenuState> {
     required this.deleteProductUseCase,
   }) : super(AdminMenuInitial()) {
     on<LoadAdminMenuRequested>(_onLoadAdminMenuRequested);
+    on<AdminCategorySelected>(_onAdminCategorySelected); // [NUEVO] Manejador de selección de categoría
     on<AddCategoryRequested>(_onAddCategoryRequested);
     on<AddProductRequested>(_onAddProductRequested);
     on<UpdateProductRequested>(_onUpdateProductRequested);
@@ -42,7 +43,8 @@ class AdminMenuBloc extends Bloc<AdminMenuEvent, AdminMenuState> {
         emit(const AdminMenuLoaded(categories: [], products: []));
         return;
       }
-      final firstCategoryId = categories.first.id;
+      // [ACTUALIZADO] Usa la categoría seleccionada que viene en el evento, o la primera por defecto
+      final firstCategoryId = event.selectedCategoryId ?? categories.first.id;
       final products = await getProductsByCategoryUseCase.call(firstCategoryId);
       emit(AdminMenuLoaded(
         categories: categories,
@@ -51,6 +53,27 @@ class AdminMenuBloc extends Bloc<AdminMenuEvent, AdminMenuState> {
       ));
     } catch (e) {
       emit(AdminMenuError('Error al cargar datos del menú: $e'));
+    }
+  }
+
+  // [NUEVO] Método para manejar el cambio de tabs/categorías sin recargar todo
+  Future<void> _onAdminCategorySelected(
+    AdminCategorySelected event,
+    Emitter<AdminMenuState> emit,
+  ) async {
+    if (state is AdminMenuLoaded) {
+      final currentState = state as AdminMenuLoaded;
+      emit(AdminMenuLoading());
+      try {
+        final products = await getProductsByCategoryUseCase.call(event.categoryId);
+        emit(AdminMenuLoaded(
+          categories: currentState.categories,
+          products: products,
+          selectedCategoryId: event.categoryId,
+        ));
+      } catch (e) {
+        emit(AdminMenuError('Error al cargar productos: $e'));
+      }
     }
   }
 

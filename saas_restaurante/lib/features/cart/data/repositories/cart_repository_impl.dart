@@ -19,12 +19,26 @@ class CartRepositoryImpl implements CartRepository {
 
   @override
   Future<void> addToCart(CartItemEntity item) async {
-    await localDataSource.upsertItem(CartItemsCompanion(
-      productId: Value(item.productId),
-      productName: Value(item.name),
-      price: Value(item.price),
-      quantity: Value(item.quantity),
-    ));
+    final existingItems = await localDataSource.getAllItems();
+    final existingIndex = existingItems.indexWhere((i) => i.productId == item.productId);
+
+    if (existingIndex != -1) {
+      final existing = existingItems[existingIndex];
+      await localDataSource.upsertItem(CartItemsCompanion(
+        id: Value(existing.id),
+        productId: Value(item.productId),
+        productName: Value(item.name),
+        price: Value(item.price),
+        quantity: Value(existing.quantity + item.quantity),
+      ));
+    } else {
+      await localDataSource.upsertItem(CartItemsCompanion(
+        productId: Value(item.productId),
+        productName: Value(item.name),
+        price: Value(item.price),
+        quantity: Value(item.quantity),
+      ));
+    }
   }
 
   @override

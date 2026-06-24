@@ -51,18 +51,40 @@ class TableScannerBloc extends Bloc<TableScannerEvent, TableScannerState> {
     QrCodeDetected event,
     Emitter<TableScannerState> emit,
   ) {
-    final raw = event.rawValue;
+    final raw = event.rawValue.trim();
 
-    // Intenta parsear el deeplink restaurantesaas://table/{id}
     String? tableId;
-    if (raw.startsWith('restaurantesaas://table/')) {
-      tableId = raw.replaceFirst('restaurantesaas://table/', '').trim();
-      if (tableId.isEmpty) tableId = null;
+
+    if (raw.contains('/table/')) {
+      final parts = raw.split('/table/');
+      if (parts.length > 1) {
+        final possibleId = parts.last.split('?').first.trim();
+        final match = RegExp(r'\d+').firstMatch(possibleId);
+        if (match != null) {
+          tableId = match.group(0);
+        }
+      }
+    } else if (raw.startsWith('restaurantesaas://table/')) {
+      final possibleId = raw.replaceFirst('restaurantesaas://table/', '').trim();
+      final match = RegExp(r'\d+').firstMatch(possibleId);
+      if (match != null) {
+        tableId = match.group(0);
+      }
+    } else {
+      final match = RegExp(r'\d+').firstMatch(raw);
+      if (match != null) {
+        tableId = match.group(0);
+      }
     }
+
+    if (tableId != null && tableId.isEmpty) {
+      tableId = null;
+    }
+
+    print('[TableScannerBloc] QR Detectado: "$raw" -> tableId extraído: "$tableId"');
 
     emit(TableScannerQrDetected(rawValue: raw, tableId: tableId));
 
-    // Si hay tableId válido, emitir estado de navegación
     if (tableId != null) {
       emit(TableScannerNavigating(tableId));
     }

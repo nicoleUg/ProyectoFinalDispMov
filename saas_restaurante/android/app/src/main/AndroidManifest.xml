@@ -6,10 +6,13 @@
     <!-- Requerido por mobile_scanner para acceso a la cámara en Android 9+ -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="saas_restaurante"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,6 +33,29 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- Habilitar el manejo automático de deep links de Flutter -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+
+            <!-- Intent filter para el esquema personalizado (restaurantesaas://) -->
+            <intent-filter android:label="restaurantesaas_deeplink">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="restaurantesaas" />
+            </intent-filter>
+
+            <!-- Intent filter para URLs HTTP/HTTPS -->
+            <intent-filter android:autoVerify="true" android:label="restaurantesaas_web_deeplink">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:host="localhost" />
+                <data android:host="restaurantesaas-c1ee0.web.app" />
+                <data android:host="restaurantesaas-c1ee0.firebasestorage.app" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

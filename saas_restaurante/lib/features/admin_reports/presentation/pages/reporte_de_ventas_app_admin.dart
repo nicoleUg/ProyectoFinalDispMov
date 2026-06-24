@@ -194,7 +194,7 @@ class _ReporteDeVentasAppAdminState extends State<ReporteDeVentasAppAdmin> {
         final children = [
           _buildSummaryCard(
             'Ingresos Totales',
-            '\$${earnings.toStringAsFixed(2)}',
+            'Bs. ${earnings.toStringAsFixed(2)}',
             Icons.attach_money,
             const Color(0xFF1B5E20),
             isTooNarrow ? double.infinity : cardWidth,
@@ -208,7 +208,7 @@ class _ReporteDeVentasAppAdminState extends State<ReporteDeVentasAppAdmin> {
           ),
           _buildSummaryCard(
             'Ticket Promedio',
-            '\$${avgTicket.toStringAsFixed(2)}',
+            'Bs. ${avgTicket.toStringAsFixed(2)}',
             Icons.receipt,
             const Color(0xFFE65100),
             isTooNarrow ? double.infinity : cardWidth,
@@ -325,7 +325,7 @@ class _ReporteDeVentasAppAdminState extends State<ReporteDeVentasAppAdmin> {
                       reservedSize: 42,
                       getTitlesWidget: (value, meta) {
                         return Text(
-                          '\$${value.toInt()}',
+                          'Bs. ${value.toInt()}',
                           style: RSTypography.labelSmall.copyWith(color: RSColors.textOnSurfaceVariant),
                         );
                       },
@@ -578,7 +578,7 @@ class _ReporteDeVentasAppAdminState extends State<ReporteDeVentasAppAdmin> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: Text(
-                        '\$${dish.earnings.toStringAsFixed(2)}',
+                        'Bs. ${dish.earnings.toStringAsFixed(2)}',
                         style: RSTypography.bodyMedium.copyWith(
                           color: RSColors.primary,
                           fontWeight: FontWeight.bold,

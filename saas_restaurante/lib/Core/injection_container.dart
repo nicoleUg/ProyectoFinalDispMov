@@ -133,10 +133,10 @@ Future<void> init() async {
   sl.registerFactory(() => TableScannerBloc(sl()));
 
   // Reviews
-  sl.registerLazySingleton<ReviewsRepository>(() => ReviewsRepositoryImpl(sl()));
+  sl.registerLazySingleton<ReviewsRepository>(() => ReviewsRepositoryImpl(sl(), sl()));
   sl.registerFactory(() => ReviewsBloc(sl()));
 
   // Favorites
-  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl()));
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(sl(), sl()));
   sl.registerFactory(() => FavoritesBloc(sl()));
 }
