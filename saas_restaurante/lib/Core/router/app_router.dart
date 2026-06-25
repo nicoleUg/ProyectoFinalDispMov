@@ -7,6 +7,7 @@ import '../../../features/menu/presentation/pages/menu_page.dart';
 import '../../../features/menu/presentation/pages/product_detail_page.dart';
 import '../../../features/cart/presentation/pages/cart_page.dart';
 import '../../../features/orders/presentation/pages/order_tracking_page.dart';
+import '../../../features/orders/presentation/pages/order_history_page.dart';
 import '../../../features/admin_menu/presentation/pages/gesti_n_de_men_app_admin.dart';
 import '../../../features/admin_menu/presentation/pages/nuevo_producto_app_admin.dart';
 import '../../../features/admin_menu/presentation/pages/editar_producto_app_admin.dart';
@@ -109,7 +110,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/orders',
-            builder: (context, state) => const OrderTrackingPage(),
+            builder: (context, state) => const OrderHistoryPage(),
           ),
           GoRoute(
             path: '/favorites',

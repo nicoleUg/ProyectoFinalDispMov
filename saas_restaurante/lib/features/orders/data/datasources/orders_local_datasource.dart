@@ -9,6 +9,7 @@ abstract class OrdersLocalDataSource {
   Future<void> markAsSynced(String orderId);
   Future<void> updateOrderStatus(String orderId, String status);
   Future<void> clearCartTable();
+  Future<void> upsertRemoteOrder(OrdersTableCompanion order, List<OrderItemsTableCompanion> items);
 }
 
 class OrdersLocalDataSourceImpl implements OrdersLocalDataSource {
@@ -56,5 +57,17 @@ class OrdersLocalDataSourceImpl implements OrdersLocalDataSource {
   @override
   Future<void> clearCartTable() async {
     await db.delete(db.cartItems).go();
+  }
+
+  @override
+  Future<void> upsertRemoteOrder(OrdersTableCompanion order, List<OrderItemsTableCompanion> items) async {
+    await db.transaction(() async {
+      await db.into(db.ordersTable).insertOnConflictUpdate(order);
+      final orderId = order.id.value;
+      await (db.delete(db.orderItemsTable)..where((t) => t.orderId.equals(orderId))).go();
+      for (var item in items) {
+        await db.into(db.orderItemsTable).insert(item);
+      }
+    });
   }
 }

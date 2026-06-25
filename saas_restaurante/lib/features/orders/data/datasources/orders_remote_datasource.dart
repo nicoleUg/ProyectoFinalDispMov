@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 abstract class OrdersRemoteDataSource {
   Future<bool> sendOrderToServer(Map<String, dynamic> orderJson);
   Future<String?> getOrderStatus(String orderId);
+  Future<List<Map<String, dynamic>>> getMyOrders();
 }
 
 class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
@@ -31,5 +32,18 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
       print('Error al obtener estado del pedido $orderId del servidor: $e');
     }
     return null;
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getMyOrders() async {
+    try {
+      final response = await dio.get('/orders');
+      if (response.statusCode == 200 && response.data != null) {
+        return List<Map<String, dynamic>>.from(response.data);
+      }
+    } catch (e) {
+      print('Error al obtener pedidos de usuario del servidor: $e');
+    }
+    return [];
   }
 }

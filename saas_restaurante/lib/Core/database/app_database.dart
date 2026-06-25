@@ -18,6 +18,7 @@ class OrdersTable extends Table {
   DateTimeColumn get createdAt => dateTime()();
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
   IntColumn get tableNumber => integer().withDefault(const Constant(0))();
+  TextColumn get userId => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -83,7 +84,7 @@ class AppDatabase extends _$AppDatabase {
         );
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,6 +97,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 6) {
         await m.addColumn(ordersTable, ordersTable.tableNumber);
+      }
+      if (from < 7) {
+        await m.addColumn(ordersTable, ordersTable.userId);
       }
     },
   );
