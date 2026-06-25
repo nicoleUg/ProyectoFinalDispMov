@@ -1219,6 +1219,15 @@ class $OrdersTableTable extends OrdersTable
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  @override
+  late final GeneratedColumn<String> userId = GeneratedColumn<String>(
+    'user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1227,6 +1236,7 @@ class $OrdersTableTable extends OrdersTable
     createdAt,
     isSynced,
     tableNumber,
+    userId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1284,6 +1294,12 @@ class $OrdersTableTable extends OrdersTable
         ),
       );
     }
+    if (data.containsKey('user_id')) {
+      context.handle(
+        _userIdMeta,
+        userId.isAcceptableOrUnknown(data['user_id']!, _userIdMeta),
+      );
+    }
     return context;
   }
 
@@ -1317,6 +1333,10 @@ class $OrdersTableTable extends OrdersTable
         DriftSqlType.int,
         data['${effectivePrefix}table_number'],
       )!,
+      userId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}user_id'],
+      ),
     );
   }
 
@@ -1333,6 +1353,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
   final DateTime createdAt;
   final bool isSynced;
   final int tableNumber;
+  final String? userId;
   const OrdersTableData({
     required this.id,
     required this.total,
@@ -1340,6 +1361,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     required this.createdAt,
     required this.isSynced,
     required this.tableNumber,
+    this.userId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1350,6 +1372,9 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     map['created_at'] = Variable<DateTime>(createdAt);
     map['is_synced'] = Variable<bool>(isSynced);
     map['table_number'] = Variable<int>(tableNumber);
+    if (!nullToAbsent || userId != null) {
+      map['user_id'] = Variable<String>(userId);
+    }
     return map;
   }
 
@@ -1361,6 +1386,9 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       createdAt: Value(createdAt),
       isSynced: Value(isSynced),
       tableNumber: Value(tableNumber),
+      userId: userId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(userId),
     );
   }
 
@@ -1376,6 +1404,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
       tableNumber: serializer.fromJson<int>(json['tableNumber']),
+      userId: serializer.fromJson<String?>(json['userId']),
     );
   }
   @override
@@ -1388,6 +1417,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'isSynced': serializer.toJson<bool>(isSynced),
       'tableNumber': serializer.toJson<int>(tableNumber),
+      'userId': serializer.toJson<String?>(userId),
     };
   }
 
@@ -1398,6 +1428,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     DateTime? createdAt,
     bool? isSynced,
     int? tableNumber,
+    Value<String?> userId = const Value.absent(),
   }) => OrdersTableData(
     id: id ?? this.id,
     total: total ?? this.total,
@@ -1405,6 +1436,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
     createdAt: createdAt ?? this.createdAt,
     isSynced: isSynced ?? this.isSynced,
     tableNumber: tableNumber ?? this.tableNumber,
+    userId: userId.present ? userId.value : this.userId,
   );
   OrdersTableData copyWithCompanion(OrdersTableCompanion data) {
     return OrdersTableData(
@@ -1416,6 +1448,7 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
       tableNumber: data.tableNumber.present
           ? data.tableNumber.value
           : this.tableNumber,
+      userId: data.userId.present ? data.userId.value : this.userId,
     );
   }
 
@@ -1427,14 +1460,15 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('isSynced: $isSynced, ')
-          ..write('tableNumber: $tableNumber')
+          ..write('tableNumber: $tableNumber, ')
+          ..write('userId: $userId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, total, status, createdAt, isSynced, tableNumber);
+      Object.hash(id, total, status, createdAt, isSynced, tableNumber, userId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1444,7 +1478,8 @@ class OrdersTableData extends DataClass implements Insertable<OrdersTableData> {
           other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.isSynced == this.isSynced &&
-          other.tableNumber == this.tableNumber);
+          other.tableNumber == this.tableNumber &&
+          other.userId == this.userId);
 }
 
 class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
@@ -1454,6 +1489,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
   final Value<DateTime> createdAt;
   final Value<bool> isSynced;
   final Value<int> tableNumber;
+  final Value<String?> userId;
   final Value<int> rowid;
   const OrdersTableCompanion({
     this.id = const Value.absent(),
@@ -1462,6 +1498,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     this.createdAt = const Value.absent(),
     this.isSynced = const Value.absent(),
     this.tableNumber = const Value.absent(),
+    this.userId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   OrdersTableCompanion.insert({
@@ -1471,6 +1508,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     required DateTime createdAt,
     this.isSynced = const Value.absent(),
     this.tableNumber = const Value.absent(),
+    this.userId = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        total = Value(total),
@@ -1483,6 +1521,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     Expression<DateTime>? createdAt,
     Expression<bool>? isSynced,
     Expression<int>? tableNumber,
+    Expression<String>? userId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1492,6 +1531,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
       if (createdAt != null) 'created_at': createdAt,
       if (isSynced != null) 'is_synced': isSynced,
       if (tableNumber != null) 'table_number': tableNumber,
+      if (userId != null) 'user_id': userId,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1503,6 +1543,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     Value<DateTime>? createdAt,
     Value<bool>? isSynced,
     Value<int>? tableNumber,
+    Value<String?>? userId,
     Value<int>? rowid,
   }) {
     return OrdersTableCompanion(
@@ -1512,6 +1553,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
       createdAt: createdAt ?? this.createdAt,
       isSynced: isSynced ?? this.isSynced,
       tableNumber: tableNumber ?? this.tableNumber,
+      userId: userId ?? this.userId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1537,6 +1579,9 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
     if (tableNumber.present) {
       map['table_number'] = Variable<int>(tableNumber.value);
     }
+    if (userId.present) {
+      map['user_id'] = Variable<String>(userId.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1552,6 +1597,7 @@ class OrdersTableCompanion extends UpdateCompanion<OrdersTableData> {
           ..write('createdAt: $createdAt, ')
           ..write('isSynced: $isSynced, ')
           ..write('tableNumber: $tableNumber, ')
+          ..write('userId: $userId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3408,6 +3454,7 @@ typedef $$OrdersTableTableCreateCompanionBuilder =
       required DateTime createdAt,
       Value<bool> isSynced,
       Value<int> tableNumber,
+      Value<String?> userId,
       Value<int> rowid,
     });
 typedef $$OrdersTableTableUpdateCompanionBuilder =
@@ -3418,6 +3465,7 @@ typedef $$OrdersTableTableUpdateCompanionBuilder =
       Value<DateTime> createdAt,
       Value<bool> isSynced,
       Value<int> tableNumber,
+      Value<String?> userId,
       Value<int> rowid,
     });
 
@@ -3485,6 +3533,11 @@ class $$OrdersTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> orderItemsTableRefs(
     Expression<bool> Function($$OrderItemsTableTableFilterComposer f) f,
   ) {
@@ -3549,6 +3602,11 @@ class $$OrdersTableTableOrderingComposer
     column: $table.tableNumber,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get userId => $composableBuilder(
+    column: $table.userId,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$OrdersTableTableAnnotationComposer
@@ -3579,6 +3637,9 @@ class $$OrdersTableTableAnnotationComposer
     column: $table.tableNumber,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get userId =>
+      $composableBuilder(column: $table.userId, builder: (column) => column);
 
   Expression<T> orderItemsTableRefs<T extends Object>(
     Expression<T> Function($$OrderItemsTableTableAnnotationComposer a) f,
@@ -3640,6 +3701,7 @@ class $$OrdersTableTableTableManager
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
                 Value<int> tableNumber = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => OrdersTableCompanion(
                 id: id,
@@ -3648,6 +3710,7 @@ class $$OrdersTableTableTableManager
                 createdAt: createdAt,
                 isSynced: isSynced,
                 tableNumber: tableNumber,
+                userId: userId,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3658,6 +3721,7 @@ class $$OrdersTableTableTableManager
                 required DateTime createdAt,
                 Value<bool> isSynced = const Value.absent(),
                 Value<int> tableNumber = const Value.absent(),
+                Value<String?> userId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => OrdersTableCompanion.insert(
                 id: id,
@@ -3666,6 +3730,7 @@ class $$OrdersTableTableTableManager
                 createdAt: createdAt,
                 isSynced: isSynced,
                 tableNumber: tableNumber,
+                userId: userId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

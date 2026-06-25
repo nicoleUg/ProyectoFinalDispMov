@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart'; 
 import 'orders_event.dart';
@@ -25,6 +26,21 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
 
       print('[OrdersBloc] Confirmando pedido de mesa. tableId recuperado: "$tableId", tableNumber: $tableNumber');
 
+      final token = await secureStorage.getAccessToken();
+      String? userId;
+      if (token != null) {
+        try {
+          final parts = token.split('.');
+          if (parts.length == 3) {
+            final payload = parts[1];
+            final normalized = base64Url.normalize(payload);
+            final decodedStr = utf8.decode(base64Url.decode(normalized));
+            final decodedJson = json.decode(decodedStr);
+            userId = decodedJson['sub']?.toString();
+          }
+        } catch (_) {}
+      }
+
       final orderItems = event.cartItems.map((c) => OrderItemEntity(
         productName: c.name,
         quantity: c.quantity,
@@ -36,6 +52,7 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
         createdAt: DateTime.now(),
         items: orderItems,
         tableNumber: tableNumber,
+        userId: userId,
       );
       await repository.createOrder(newOrder);
       

@@ -6,6 +6,7 @@ class OrderEntity {
   final List<OrderItemEntity> items;
   final bool isSynced;
   final int tableNumber;
+  final String? userId;
 
   OrderEntity({
     required this.id,
@@ -15,6 +16,7 @@ class OrderEntity {
     required this.items,
     this.isSynced = false,
     this.tableNumber = 0,
+    this.userId,
   });
 }
 
